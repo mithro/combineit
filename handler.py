@@ -18,6 +18,7 @@ from models.base import *
 from models.peruser import *
 
 
+
 class PopulatePage(webapp.RequestHandler):
   def get(self):
     user = users.get_current_user()
@@ -86,6 +87,39 @@ class BasePage(webapp.RequestHandler):
       self.response.headers['Content-Type'] = 'text/html'
       self.response.out.write(template.render(tmpl, result))
 
+
+def EditPage(item):
+  class EditPage(BasePage):
+    def setup(self, gamekey):
+      if not BasePage.setup(self, gamekey):
+         return
+
+      self.key_name = self.request.get('key_name')
+      if self.key_name:
+        return item.Meta.model.get_by_key_name(self.key_name)
+
+    def get(self, gamekey):
+      entity = self.setup(gamekey)
+      self.render('templates/form.html', 
+                  {'key_name': self.key_name,
+                   'form': item(instance=entity)})
+  
+    def post(self, gamekey):
+      entity = self.setup(gamekey)
+ 
+      data = item(data=self.request.POST, instance=entity)
+      if data.is_valid():
+        entity = data.save(commit=False)
+        entity.game = self.game
+        entity.user = self.user
+        entity.put()
+        self.redirect('')
+      else:
+        self.render('templates/form.html', 
+                    {'key_name': self.key_name,
+                     'form': data})
+
+  return EditPage
 
 class ElementPage(BasePage):
   """Get a list of elements for a user."""
@@ -173,12 +207,16 @@ class CombinePage(BasePage):
          'new_elements': new_elements,
          'new_categories': new_categories})
 
+from forms import base
 
 application = webapp.WSGIApplication(
-  [('/(.*)/elements',   ElementPage),
-   ('/(.*)/categories', CategoryPage),
-   ('/(.*)/combine',    CombinePage),
-   ('/populate',        PopulatePage),
+  [('/(.*)/elements',        ElementPage),
+   ('/(.*)/elements/edit',   EditPage(base.ElementForm)),
+   ('/(.*)/categories',      CategoryPage),
+   ('/(.*)/categories/edit', EditPage(base.CategoryForm)),
+   ('/(.*)/combine',         CombinePage),
+   ('/(.*)/combine/edit',    EditPage(base.CombinationForm)), 
+   ('/populate',             PopulatePage),
    ],
   debug=True)
 

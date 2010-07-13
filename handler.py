@@ -9,95 +9,13 @@ import logging
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.ext import db
 from google.appengine.ext.webapp import template
+from google.appengine.ext.webapp.util import run_wsgi_app
 
-from django.utils import simplejson
+import json
 
-
-# The following tables describe a game.
-
-class Game(db.Model):
-  """A single combination game."""
-  name = db.StringProperty(required=True)
-  description = db.StringProperty(multiline=True)
-  background = db.StringProperty()
-  owner = db.UserProperty(required=True)
-
-class Category(db.Model):
-  """How to group different elements together."""
-  game = db.ReferenceProperty(Game, required=True)
-  name = db.StringProperty(required=True)
-  description = db.StringProperty(multiline=True)
-  icon = db.StringProperty()
-
-class Element(db.Model):
-  """Fundamental building blocks of the game.
-
-  Each element can be in only one category.
-  """
-  game = db.ReferenceProperty(Game, required=True)
-  name = db.StringProperty(required=True)
-  description = db.StringProperty(multiline=True)
-  icon = db.StringProperty()
-  category = db.ReferenceProperty(Category, required=True)
-
-class Combination(db.Model):
-  """The actual point of the game, to combined elements together to produce more
-  elements.
-  """
-  game = db.ReferenceProperty(Game, required=True)
-  name = db.StringProperty()
-  description = db.StringProperty(multiline=True)
-
-  inputkeys = db.StringListProperty()
-  outputkeys = db.StringListProperty()
-
-  @property
-  def input(self):
-    for key in self.inputkeys:
-      yield Element.get_by_key_name(key)
-
-  @property
-  def output(self):
-    for key in self.outputkeys:
-      yield Element.get_by_key_name(key)
-
-
-# The following tables describe the "state" of a person who is playing a game.
-
-
-class Reference(db.Model):
-  @classmethod
-  def Create(cls, user, game, reference):
-    """Returns if a new object was created."""
-    key_name = '%s--%s--%s' % (user.user_id(), game.key(), reference.key())
-
-    if cls.get_by_key_name(key_name):
-      return False
-
-    obj = cls(user=user, game=game, reference=reference, key_name=key_name)
-    obj.put()
-    return obj
-
-  user = db.UserProperty()
-  game = db.ReferenceProperty(Game)
-
-class UsersElement(Reference):
-  """The list of elements a User has discovered."""
-  reference = db.ReferenceProperty(Element)
-
-class UsersCategory(Reference):
-  """The list of categories a user has discovered."""
-  reference = db.ReferenceProperty(Category)
-
-class UsersCombination(Reference):
-  """The list of combinations a User has discovered."""
-  reference = db.ReferenceProperty(Combination)
-
-
-# The actual pages...
+from models.base import *
+from models.peruser import *
 
 
 class PopulatePage(webapp.RequestHandler):
@@ -128,28 +46,6 @@ class PopulatePage(webapp.RequestHandler):
     combine.put()
 
 
-class JSONEncoder(simplejson.JSONEncoder):
-  def default(self, o):
-    if isinstance(o, set):
-      return list(o)
-
-    try:
-      output = {'__type': o.__class__.__name__}
-      for property in o.properties():
-        cls = getattr(o.__class__, property)
-        value = getattr(o, property)
-
-        if isinstance(cls, db.ReferenceProperty):
-          value = str(value.key().name())
-        elif isinstance(cls, db.UserProperty):
-          value = value.user_id()
-
-        output[property] = value
-      return output
-    except AttributeError:
-      return simplejson.JSONEncoder.default(self, o)
-
-
 class BasePage(webapp.RequestHandler):
   def setup(self, gamekey):
     # User needs to be logged in
@@ -178,7 +74,7 @@ class BasePage(webapp.RequestHandler):
     if output == 'json':
       self.response.headers['Content-Type'] = 'application/json'
 
-      self.response.out.write(JSONEncoder().encode(result))
+      self.response.out.write(json.JSONEncoder().encode(result))
 
     elif output == 'text':
       self.response.headers['Content-Type'] = 'text/plain'
@@ -201,7 +97,7 @@ class ElementPage(BasePage):
     query.filter('user =', self.user)
     query.filter('game =', self.game)
 
-    return self.render('list.html', {
+    return self.render('templates/list.html', {
         'results': [i.reference for i in query.fetch(1000)]})
 
 
@@ -215,7 +111,7 @@ class CategoryPage(BasePage):
     query.filter('user =', self.user)
     query.filter('game =', self.game)
 
-    return self.render('list.html', {
+    return self.render('templates/list.html', {
         'results': [i.reference for i in query.fetch(1000)]})
 
 
@@ -241,7 +137,7 @@ class CombinePage(BasePage):
     logging.debug('results %s', results)
 
     if not results:
-      self.render('nocombine.html', {'code': 404, 'error': 'No dice!'})
+      self.render('templates/nocombine.html', {'code': 404, 'error': 'No dice!'})
       return
 
     for combination in results:
@@ -254,7 +150,7 @@ class CombinePage(BasePage):
       if input == tomatch:
         break
     else:
-      self.render('nocombine.html', {'code': 302, 'error': 'Almost!'})
+      self.render('templates/nocombine.html', {'code': 302, 'error': 'Almost!'})
       return
 
     categories = set()
@@ -271,7 +167,7 @@ class CombinePage(BasePage):
         new_categories.add(category)
 
     return self.render(
-        'combine.html',
+        'templates/combine.html',
         {'code': 200,
          'combination': combination,
          'new_elements': new_elements,

@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>{{game.name}} - Combine It!</title>
+</head>
+<style type="text/css"></style>
+<body>
+  <h1>{{game.name}} created by {{game.owner.nickname}}</h1>
+
+  <h1>Combination found!</h1>
+  <p>
+    {% for element in combination.input %}
+      {{ element.name }}
+    {% endfor %}
+<pre>
+  ||
+  \/
+</pre>
+    {% for element in combination.output %}
+      {{ element.name }}
+    {% endfor %}
+  </p>
+
+  {% if combination.name %}
+  <h2>{{combination.name}}</h2>
+  {% endif %}
+  {% if combination.description %}
+  <p>{{combination.description}}</p>
+  {% endif %}
+
+  {% if new_elements %}
+  <h1>New Elements found</h1>
+  <p>
+    {% for element in new_elements %}
+      <h2>{{ element.name }}</h2>
+    {% endfor %}
+  </p>
+  {% else %}
+  <h1>No new elements found.</h1>
+  {% endif %}
+
+  {% if new_categories %}
+  <h1>New Categories found</h1>
+  <p>
+    {% for category in new_categories %}
+      <h2>{{ category.name }}</h2>
+    {% endfor %}
+  </p>
+  {% else %}
+  <h1>No new categories found.</h1>
+  {% endif %}
+
+</body>
+</html>

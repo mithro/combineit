@@ -3,26 +3,32 @@
 
 """This module represents what people have voted for."""
 
+
+import pprint
 import logging
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
+from google.appengine.ext.webapp import template
+
+from django.utils import simplejson
+
 
 # The following tables describe a game.
 
 class Game(db.Model):
   """A single combination game."""
-  name = db.StringProperty()
+  name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
   background = db.StringProperty()
-  owner = db.UserProperty()
+  owner = db.UserProperty(required=True)
 
 class Category(db.Model):
   """How to group different elements together."""
-  game = db.ReferenceProperty(Game)
-  name = db.StringProperty()
+  game = db.ReferenceProperty(Game, required=True)
+  name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
   icon = db.StringProperty()
 
@@ -31,22 +37,33 @@ class Element(db.Model):
 
   Each element can be in only one category.
   """
-  game = db.ReferenceProperty(Game)
-  name = db.StringProperty()
+  game = db.ReferenceProperty(Game, required=True)
+  name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
   icon = db.StringProperty()
-  category = db.ReferenceProperty(Category)
+  category = db.ReferenceProperty(Category, required=True)
 
 class Combination(db.Model):
   """The actual point of the game, to combined elements together to produce more
   elements.
   """
-  game = db.ReferenceProperty(Game)
+  game = db.ReferenceProperty(Game, required=True)
   name = db.StringProperty()
   description = db.StringProperty(multiline=True)
 
-  input = db.StringListProperty()
-  output = db.StringListProperty()
+  inputkeys = db.StringListProperty()
+  outputkeys = db.StringListProperty()
+
+  @property
+  def input(self):
+    for key in self.inputkeys:
+      yield Element.get_by_key_name(key)
+
+  @property
+  def output(self):
+    for key in self.outputkeys:
+      yield Element.get_by_key_name(key)
+
 
 # The following tables describe the "state" of a person who is playing a game.
 
@@ -107,61 +124,99 @@ class PopulatePage(webapp.RequestHandler):
 
     combine = Combination(
         key_name="comb1",
-        game=game, input=['element00', 'element01'], output=['element02'])
+        game=game, inputkeys=['element00', 'element01'], outputkeys=['element02'])
     combine.put()
 
 
+class JSONEncoder(simplejson.JSONEncoder):
+  def default(self, o):
+    if isinstance(o, set):
+      return list(o)
+
+    try:
+      output = {'__type': o.__class__.__name__}
+      for property in o.properties():
+        cls = getattr(o.__class__, property)
+        value = getattr(o, property)
+
+        if isinstance(cls, db.ReferenceProperty):
+          value = str(value.key().name())
+        elif isinstance(cls, db.UserProperty):
+          value = value.user_id()
+
+        output[property] = value
+      return output
+    except AttributeError:
+      return simplejson.JSONEncoder.default(self, o)
+
+
 class BasePage(webapp.RequestHandler):
-  def setup(self, game):
+  def setup(self, gamekey):
     # User needs to be logged in
     user = users.get_current_user()
     logging.debug("User %s", user)
     if not user:
       self.redirect(users.create_login_url(self.request.uri))
-      return (None, None)
+      return False
 
     # Find the game object associated with this page..
     query = Game.all()
-    query.filter('name =', game)
+    query.filter('name =', gamekey)
     games = query.fetch(1)
     logging.debug("Games %s", games)
     if not games:
-      return (None, None)
+      return False
 
-    return (user, games[0])
+    self.user = user
+    self.game = games[0]
 
-  def render(self, result):
-    import pprint
-    self.response.headers['Content-Type'] = 'text/plain'
-    self.response.out.write(pprint.pformat(result))
+    return True
+
+  def render(self, tmpl, result):
+    output = self.request.get('output')
+
+    if output == 'json':
+      self.response.headers['Content-Type'] = 'application/json'
+
+      self.response.out.write(JSONEncoder().encode(result))
+
+    elif output == 'text':
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.out.write(pprint.pformat(result))
+    else:
+      result['game'] = self.game
+      result['user'] = self.user
+
+      self.response.headers['Content-Type'] = 'text/html'
+      self.response.out.write(template.render(tmpl, result))
 
 
 class ElementPage(BasePage):
   """Get a list of elements for a user."""
-  def get(self, game):
-    user, game = self.setup(game)
-    if not user or not game:
+  def get(self, gamekey):
+    if not self.setup(gamekey):
       return
 
     query = UsersElement.all()
-    query.filter('user =', user)
-    query.filter('game =', game)
+    query.filter('user =', self.user)
+    query.filter('game =', self.game)
 
-    return self.render({'results': [i.reference.name for i in query.fetch(1000)]})
+    return self.render('list.html', {
+        'results': [i.reference for i in query.fetch(1000)]})
 
 
 class CategoryPage(BasePage):
   """Get a list of categories for a user."""
-  def get(self, game):
-    user, game = self.setup(game)
-    if not user or not game:
+  def get(self, gamekey):
+    if not self.setup(gamekey):
       return
 
     query = UsersCategory.all()
-    query.filter('user =', user)
-    query.filter('game =', game)
+    query.filter('user =', self.user)
+    query.filter('game =', self.game)
 
-    return self.render({'results': [i.reference.name for i in query.fetch(1000)]})
+    return self.render('list.html', {
+        'results': [i.reference for i in query.fetch(1000)]})
 
 
 class CombinePage(BasePage):
@@ -170,9 +225,8 @@ class CombinePage(BasePage):
 
   It also returns if any of the elements or categories are new.
   """
-  def get(self, game):
-    user, game = self.setup(game)
-    if not user or not game:
+  def get(self, gamekey):
+    if not self.setup(gamekey):
       return
 
     input = self.request.get('to').split(',')
@@ -181,49 +235,47 @@ class CombinePage(BasePage):
 
     query = Combination.all()
     for element in input:
-      query.filter('input =', element)
+      query.filter('inputkeys =', element)
 
     results = query.fetch(1000)
     logging.debug('results %s', results)
 
     if not results:
-      self.render('No dice!')
+      self.render('nocombine.html', {'code': 404, 'error': 'No dice!'})
       return
 
     for combination in results:
       # Check the match is exact
       tomatch = []
-      for elementid in combination.input:
+      for elementid in combination.inputkeys:
         tomatch.append(elementid)
       tomatch = list(sorted(tomatch))
 
       if input == tomatch:
         break
     else:
-      self.render('Almost!')
+      self.render('nocombine.html', {'code': 302, 'error': 'Almost!'})
       return
 
     categories = set()
     new_elements = set()
-    for elementid in combination.output:
-
-      element = Element.get_by_key_name(elementid)
-      if not element:
-        raise Exception('Element %s not found' % element)
-
+    for element in combination.output:
       categories.add(element.category)
 
-      if UsersElement.Create(user, game, element):
+      if UsersElement.Create(self.user, self.game, element):
         new_elements.add(element)
 
     new_categories = set()
     for category in categories:
-      if UsersCategory.Create(user, game, category):
+      if UsersCategory.Create(self.user, self.game, category):
         new_categories.add(category)
 
-    return self.render({'combination': combination,
-                   'new_elements': new_elements,
-                   'new_categories': new_categories})
+    return self.render(
+        'combine.html',
+        {'code': 200,
+         'combination': combination,
+         'new_elements': new_elements,
+         'new_categories': new_categories})
 
 
 application = webapp.WSGIApplication(

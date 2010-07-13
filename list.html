@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>{{game.name}} - Combine It!</title>
+</head>
+<style type="text/css"></style>
+<body>
+  <h1>{{game.name}} created by {{game.owner.nickname}}</h1>
+
+  {% if results %}
+  {% for element in results %}
+    <h2>{{ element.name }}</h2>
+  {% endfor %}
+  {% else %}
+    No elements have been found yet!
+  {% endif %}
+
+</body>
+</html>

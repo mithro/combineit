@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:export-ydpi="72.000000"
+   inkscape:export-xdpi="72.000000"
+   inkscape:export-filename="/home/melzi/Pics/weather/thunder.png"
+   sodipodi:docname="cloud.svg"
+   sodipodi:docbase="/home/melzi/Pics/weather"
+   inkscape:version="0.46"
+   sodipodi:version="0.32"
+   id="svg3103"
+   height="164.67"
+   width="164.66884"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
+  <defs
+     id="defs3105">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 83.125 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="171.25 : 83.125 : 1"
+       inkscape:persp3d-origin="85.625 : 55.416667 : 1"
+       id="perspective41" />
+    <linearGradient
+       id="linearGradient9611"
+       inkscape:collect="always">
+      <stop
+         id="stop9613"
+         offset="0"
+         style="stop-color:#ffc800;stop-opacity:1;" />
+      <stop
+         id="stop9615"
+         offset="1"
+         style="stop-color:#ffc800;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3211">
+      <stop
+         id="stop3213"
+         offset="0"
+         style="stop-color:#b4b4b4;stop-opacity:1;" />
+      <stop
+         id="stop3215"
+         offset="1"
+         style="stop-color:#f0f0f0;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4161">
+      <stop
+         id="stop4163"
+         offset="0"
+         style="stop-color:#ffc800;stop-opacity:1;" />
+      <stop
+         id="stop4165"
+         offset="1"
+         style="stop-color:#ffc100;stop-opacity:0;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5079"
+       inkscape:collect="always">
+      <stop
+         id="stop5081"
+         offset="0"
+         style="stop-color:white;stop-opacity:1;" />
+      <stop
+         id="stop5083"
+         offset="1"
+         style="stop-color:white;stop-opacity:0" />
+    </linearGradient>
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1554"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientTransform="translate(57,-24)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1556"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientTransform="translate(57,-24)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1558"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientTransform="translate(57,-24)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1560"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1562"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientTransform="translate(57,-24)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1564"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientTransform="translate(57,-24)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1566"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="143.83321"
+       x2="555.45441"
+       y1="146.65633"
+       x1="547.49896"
+       gradientTransform="translate(57,-24)"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1568"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="163.79573"
+       x2="208.62442"
+       y1="119.7196"
+       x1="208.62442"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1570"
+       xlink:href="#linearGradient9611"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="64.715645"
+       x2="847.01324"
+       y1="23.273985"
+       x1="847.01324"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1572"
+       xlink:href="#linearGradient5079"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="693.25641"
+       x2="440.10486"
+       y1="613.38153"
+       x1="440.10486"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1574"
+       xlink:href="#linearGradient3211"
+       inkscape:collect="always" />
+    <linearGradient
+       y2="954.76569"
+       x2="674.64966"
+       y1="874.65875"
+       x1="674.64966"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient1576"
+       xlink:href="#linearGradient4161"
+       inkscape:collect="always" />
+  </defs>
+  <sodipodi:namedview
+     showborder="true"
+     inkscape:window-y="6"
+     inkscape:window-x="0"
+     inkscape:window-height="944"
+     inkscape:window-width="1278"
+     inkscape:current-layer="layer3"
+     inkscape:document-units="px"
+     inkscape:cy="83"
+     inkscape:cx="83"
+     inkscape:zoom="2.3012048"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false" />
+  <metadata
+     id="metadata3108">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>weather</dc:title>
+        <dc:date>11.16.2006</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Raoul René Melcer</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <cc:license
+           rdf:resource="http://web.resource.org/cc/PublicDomain" />
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>Raoul René Melcer</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:source>melcer@gmx.ch</dc:source>
+        <dc:relation />
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>cloud</rdf:li>
+            <rdf:li>weather</rdf:li>
+            <rdf:li>symbol</rdf:li>
+            <rdf:li>card</rdf:li>
+            <rdf:li>map</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Raoul René Melcer</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:identifier>melcer@gmx.ch</dc:identifier>
+        <dc:description>for weather application or map. you must deletet/hidden the groups/layers you dont use.</dc:description>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://web.resource.org/cc/PublicDomain">
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Reproduction" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Distribution" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     style="opacity:1;display:inline"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="sun"
+     transform="translate(-0.7000152,-45.476998)" />
+  <g
+     style="display:inline"
+     inkscape:label="moon"
+     id="layer2"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)" />
+  <g
+     inkscape:label="cloud"
+     id="layer3"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)">
+    <g
+       id="g2284"
+       transform="translate(-174.6637,48.6437)"
+       style="display:inline">
+      <path
+         style="fill:#ebebeb;fill-opacity:1;fill-rule:evenodd;stroke:#bebebe;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1"
+         d="M 180.36997,107.16857 L 334.43478,107.16857 C 353.53947,75.902194 314.92718,61.258763 300.04217,82.953377 C 278.80512,37.767573 220.96397,45.210516 217.21918,78.040149 C 192.50978,54.860884 164.57375,87.011932 180.36997,107.16857 z"
+         id="path2286"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:type="inkscape:offset"
+         inkscape:radius="-3.2109792"
+         inkscape:original="M 843.75 20.0625 C 826.16698 20.378714 810.74739 30.428934 808.875 46.84375 C 784.16561 23.664485 756.23503 55.812109 772.03125 75.96875 L 926.09375 75.96875 C 945.19841 44.702373 906.60376 30.086636 891.71875 51.78125 C 881.10023 29.188348 861.33302 19.746286 843.75 20.0625 z "
+         style="fill:url(#linearGradient1572);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1"
+         id="path2288"
+         d="M 843.8125,23.28125 C 827.41871,23.576077 813.72665,32.629552 812.0625,47.21875 C 811.91837,48.418344 811.11312,49.435515 809.97861,49.851063 C 808.84409,50.266611 807.57235,50.010199 806.6875,49.1875 C 801.00041,43.852581 795.46333,41.94125 790.5,42 C 785.53667,42.05875 780.99986,44.159785 777.46875,47.5 C 770.73281,53.871796 768.10215,64.250471 773.78125,72.75 L 924.15625,72.75 C 927.81289,66.16983 928.63636,60.757512 927.75,56.625 C 926.79318,52.163961 923.99968,48.887581 920.15625,46.84375 C 912.46938,42.756087 900.89474,44.091354 894.375,53.59375 C 893.72688,54.548056 892.61669,55.081402 891.46665,54.990949 C 890.31662,54.900497 889.30346,54.200147 888.8125,53.15625 C 878.70001,31.640025 860.20329,22.986477 843.8125,23.28125 z"
+         transform="translate(-591.6695,31.18711)" />
+    </g>
+  </g>
+  <g
+     style="opacity:1;display:inline"
+     inkscape:label="thunder"
+     id="layer4"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)" />
+  <g
+     style="opacity:1"
+     inkscape:label="rain"
+     id="layer5"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)" />
+  <g
+     inkscape:label="rainfall"
+     id="layer6"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)" />
+  <g
+     style="display:inline"
+     inkscape:label="snow"
+     id="layer7"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)" />
+  <g
+     style="display:inline"
+     inkscape:label="sowfall"
+     id="layer8"
+     inkscape:groupmode="layer"
+     transform="translate(-0.7000152,-45.476998)" />
+</svg>

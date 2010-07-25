@@ -1,0 +1,19 @@
+<html>
+  <body>
+      <table>
+        <tr>
+			<th>Key</th><th>Name</th><th>Icon</th><th>Category</th><th>Category Icon</th><th>-</th>
+		</tr>
+		{% for element in elements %}
+		<tr>
+			<td>{{ element.key }}</td>
+			<td>{{ element.name }} </td>
+			<td><img src="{{ element.icon }}" width=32 height=32></td>
+			<td>{{ element.category.name }}</td>
+			<td><img src="{{ element.category.icon }}" width=32 height=32></td>
+			<td><a href="/{{ game.key.name }}/elements/edit?key={{ element.key }}">Edit</a></td>
+		</tr>
+		{% endfor %}
+      </table>
+  </body>
+</html>

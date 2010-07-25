@@ -57,15 +57,14 @@ class BasePage(webapp.RequestHandler):
       return False
 
     # Find the game object associated with this page..
-    query = Game.all()
-    query.filter('name =', gamekey)
-    games = query.fetch(1)
-    logging.debug("Games %s", games)
-    if not games:
+    game = Game.get_by_key_name(gamekey)
+    if not game:
+      logging.warn('No game found %s', gamekey)
       return False
+    game.key_name = gamekey
 
     self.user = user
-    self.game = games[0]
+    self.game = game
 
     return True
 
@@ -86,6 +85,45 @@ class BasePage(webapp.RequestHandler):
 
       self.response.headers['Content-Type'] = 'text/html'
       self.response.out.write(template.render(tmpl, result))
+
+
+class ElementListPage(BasePage):
+  """Page which lists all elements for a game."""
+
+  def get(self, gamekey):
+    if not self.setup(gamekey):
+      return
+
+    query = Element.all()
+    query.filter('game =', self.game)
+
+    elements = [i for i in query.fetch(1000)]
+
+    logging.warn(elements)
+
+    self.render('templates/element-list.html', 
+                {'elements': elements})
+
+class ElementEditPage(BasePage):
+  """Page to edit elements for a game."""
+
+  def get(self, gamekey):
+    if not self.setup(gamekey):
+      return
+
+    element = Element.get(self.request.get('key'))
+    if not element:
+      logging.warn('No element found: %s', element)
+      return
+
+    query = Category.all()
+    query.filter('game =', self.game)
+
+    categories = query.fetch(1000)
+
+    self.render('templates/element-edit.html', 
+                {'element': element,
+                 'categories': categories})
 
 
 class ElementPage(BasePage):
@@ -174,10 +212,10 @@ class CombinePage(BasePage):
          'new_elements': new_elements,
          'new_categories': new_categories})
 
-from forms import base
-
 application = webapp.WSGIApplication(
   [('/(.*)/elements',        ElementPage),
+   ('/(.*)/elements/list',   ElementListPage),
+   ('/(.*)/elements/edit',   ElementEditPage),
    ('/(.*)/categories',      CategoryPage),
    ('/(.*)/combine',         CombinePage),
    ('/populate',             PopulatePage),

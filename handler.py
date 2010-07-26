@@ -14,6 +14,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 import json
 
+from google.appengine.ext import db
 from models.base import *
 from models.peruser import *
 
@@ -86,44 +87,113 @@ class BasePage(webapp.RequestHandler):
       self.response.headers['Content-Type'] = 'text/html'
       self.response.out.write(template.render(tmpl, result))
 
-
-class ElementListPage(BasePage):
-  """Page which lists all elements for a game."""
-
+class DeletePage(BasePage):
   def get(self, gamekey):
     if not self.setup(gamekey):
       return
 
-    query = Element.all()
+    key = self.request.get('key')
+    object = self.klass.get(key)
+    object.delete()
+    self.redirect('/%s/%s/list' % (self.game.key().name(), self.url))
+
+class ElementDeletePage(DeletePage):
+  url = "elements"
+  klass = Element
+
+
+class CategoryDeletePage(DeletePage):
+  url = "categories"
+  klass = Category
+
+
+class EditListPage(BasePage):
+  def get(self, gamekey):
+    if not self.setup(gamekey):
+      return
+
+    query = self.klass.all()
     query.filter('game =', self.game)
 
-    elements = [i for i in query.fetch(1000)]
+    objects = [i for i in query.fetch(1000)]
 
-    logging.warn(elements)
+    logging.warn(objects)
 
-    self.render('templates/element-list.html', 
-                {'elements': elements})
+    self.render('templates/edit-list.html', 
+                {'objects': objects, 'url': self.url})
 
-class ElementEditPage(BasePage):
-  """Page to edit elements for a game."""
+
+class ElementListPage(EditListPage):
+  url = "elements"
+  klass = Element
+
+
+class CategoryListPage(EditListPage):
+  url = "categories"
+  klass = Category
+
+
+class EditPage(BasePage):
 
   def get(self, gamekey):
     if not self.setup(gamekey):
       return
 
-    element = Element.get(self.request.get('key'))
-    if not element:
-      logging.warn('No element found: %s', element)
+    key = self.request.get('key')
+    try:
+      object = self.klass.get(key)
+    except db.BadKeyError:
+      object = None
+
+    self.render(object)
+
+  def post(self, gamekey):
+    if not self.setup(gamekey):
       return
 
+    try:
+      object = self.klass.get(self.request.get('key'))
+    except db.BadKeyError:
+      object = self.klass(game=self.game, name='New', desc='New')
+
+    for attr in "name", "description", "icon":
+      setattr(object, attr, self.request.get(attr))
+
+    return object
+
+class ElementEditPage(EditPage):
+  url = "elements"
+  klass = Element
+
+  def post(self, gamekey):
+    element = EditPage.post(self, gamekey)
+    element.category = Category.get(self.request.get('category'))
+    element.key = element.put()
+
+    self.render(element)
+
+  def render(self, element):
     query = Category.all()
     query.filter('game =', self.game)
-
     categories = query.fetch(1000)
 
-    self.render('templates/element-edit.html', 
-                {'element': element,
-                 'categories': categories})
+    EditPage.render(self, 'templates/edit-element.html', 
+                    {'object': element,
+                     'categories': categories})
+
+class CategoryEditPage(EditPage):
+  url = "categories"
+  klass = Category
+
+  def post(self, gamekey):
+    category = EditPage.post(self, gamekey)
+    category.put()
+
+    self.render(category)
+
+  def render(self, category):
+    EditPage.render(self, 'templates/edit-category.html', 
+                    {'object': category})
 
 
 class ElementPage(BasePage):
@@ -216,7 +286,11 @@ application = webapp.WSGIApplication(
   [('/(.*)/elements',        ElementPage),
    ('/(.*)/elements/list',   ElementListPage),
    ('/(.*)/elements/edit',   ElementEditPage),
+   ('/(.*)/elements/delete', ElementDeletePage),
    ('/(.*)/categories',      CategoryPage),
+   ('/(.*)/categories/list', CategoryListPage),
+   ('/(.*)/categories/edit', CategoryEditPage),
+   ('/(.*)/categories/delete', CategoryDeletePage),
    ('/(.*)/combine',         CombinePage),
    ('/populate',             PopulatePage),
    ],

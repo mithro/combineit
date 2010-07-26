@@ -1,0 +1,22 @@
+<html>
+  <body>
+      <table>
+        <tr>
+          <th>Name</th><th>Icon</th><th></th>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><a href="/{{ game.key.name }}/{{ url }}/edit">New</a></td>
+        </tr>
+        {% for object in objects %}
+        <tr>
+            <td>{{ object.name }} </td>
+            <td><img src="{{ object.icon }}" width=32 height=32></td>
+            <td><a href="/{{ game.key.name }}/{{ url }}/edit?key={{ object.key }}">Edit</a></td>
+            <td><a href="/{{ game.key.name }}/{{ url }}/delete?key={{ object.key }}">Delete</a></td>
+        </tr>
+        {% endfor %}
+      </table>
+  </body>
+</html>

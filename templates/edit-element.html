@@ -1,0 +1,38 @@
+<html>
+  <body>
+    <a href="/{{ game.key.name }}/elements/list">&lt; Back</a>
+    <form method="POST" action="/{{ game.key.name }}/elements/edit">
+      <input name="key" type="hidden" value="{{ object.key }}">
+      <table>
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name" value="{{ object.name }}"></td>
+        </tr><tr>
+          <td>Description:</td>
+          <td><textarea name="description">{{ object.description }}</textarea></td>
+        </tr><tr>
+          <td>Icon:</td>
+          <td><input type="text" name="icon" value="{{ object.icon }}" 
+                 onchange="document.getElementById('icon-preview').src = this.value;"></td>
+        </tr><tr>
+          <td colspan="2"><img id="icon-preview" src="{{ object.icon }}" height="256" width="256"></td>
+        </tr><tr>
+          <td>Category:</td>
+          <td>
+            <select name="category" onchange="document.getElementById('category-preview').src = this.options[this.selectedIndex].getAttribute('src');">
+            {% for category in categories %}
+              <option value="{{ category.key }}" {% ifequal category.key object.category.key %} selected {% endifequal %}
+                      src="{{ category.icon }}">{{ category.name }}</option>
+            {% endfor %}
+            </select>
+          </td>
+        </tr><tr>
+          <td colspan="2"><img id="category-preview" src="{{ object.category.icon }}" height="256" width="256"></td>
+        </tr><tr>
+          <td><input type="submit" value="Save"></td>
+          <td><a href="/{{ game.key.name }}/categories/delete?key={{category.key}}">Delete</a></td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>

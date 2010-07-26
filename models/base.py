@@ -31,7 +31,7 @@ class Element(db.Model):
   name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
   icon = db.StringProperty()
-  category = db.ReferenceProperty(Category, required=True)
+  category = db.ReferenceProperty(Category)
 
 
 class Combination(db.Model):

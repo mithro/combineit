@@ -8,7 +8,7 @@ handlers:
   static_dir: js
 
 - url: /images
-  static_dir: image
+  static_dir: images
 
 - url: /.*
   script: handler.py

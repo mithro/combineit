@@ -1,0 +1,53 @@
+<html>
+  <body>
+    <a href="/">&lt; Back</a>
+    <form method="POST" action="/{{ object.key.name }}/edit">
+      <input name="key" type="hidden" value="{{ object.key }}">
+      <table>
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name" value="{{ object.name }}"></td>
+        </tr><tr>
+          <td>Description:</td>
+          <td><textarea name="description">{{ object.description }}</textarea></td>
+        </tr><tr>
+          <td><a href="/{{ object.key.name }}/elements/list">Elements</a></td>
+          <td><a href="/{{ object.key.name }}/categories/list">Categories</a></td>
+        </tr><tr>
+          <td>Category:</td>
+          <td>
+            <select name="starting_categories" multiple>
+            {% for category in categories %}
+              <option value="{{ category.key }}" 
+{% for selected in object.starting_categories %}
+{% ifequal category.key_str selected %}
+   selected
+{% endifequal %}
+{% endfor %}
+                      src="{{ category.icon }}">{{ category.name }}</option>
+            {% endfor %}
+            </select>
+          </td>
+        </tr><tr>
+          <td>Elements:</td>
+          <td>
+            <select name="starting_elements" multiple>
+            {% for element in elements %}
+              <option value="{{ element.key }}" 
+{% for selected in object.starting_elements %}
+{% ifequal element.key_str selected %}
+   selected
+{% endifequal %}
+{% endfor %}
+                      src="{{ element.icon }}">{{ element.name }}</option>
+            {% endfor %}
+            </select>
+          </td>
+        </tr><tr>
+          <td><input type="submit" value="Save"></td>
+          <td><a href="/{{ object.key.name }}/delete?key={{object.key}}">Delete</a></td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>

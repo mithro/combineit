@@ -87,6 +87,7 @@ class BasePage(webapp.RequestHandler):
       self.response.headers['Content-Type'] = 'text/html'
       self.response.out.write(template.render(tmpl, result))
 
+
 class DeletePage(BasePage):
   def get(self, gamekey):
     if not self.setup(gamekey):
@@ -160,6 +161,33 @@ class EditPage(BasePage):
       setattr(object, attr, self.request.get(attr))
 
     return object
+
+class GameEditPage(EditPage):
+  url = ""
+  klass = Game
+
+  def post(self, gamekey):
+    game = EditPage.post(self, gamekey)
+
+    game.starting_categories = self.request.get_all('starting_categories')
+    game.starting_elements = self.request.get_all('starting_elements')
+    game.put()
+
+    self.render(game)
+
+  def render(self, game):
+    query = Category.all()
+    query.filter('game =', self.game)
+    categories = query.fetch(1000)
+
+    query = Element.all()
+    query.filter('game =', self.game)
+    elements = query.fetch(1000)
+
+    EditPage.render(
+       self, 'templates/edit-game.html',
+       {'object': game, 'categories': categories, 'elements': elements})
+
 
 class ElementEditPage(EditPage):
   url = "elements"
@@ -282,8 +310,46 @@ class CombinePage(BasePage):
          'new_elements': new_elements,
          'new_categories': new_categories})
 
+
+class IndexPage(webapp.RequestHandler):
+  def get(self):
+    query = Game.all()
+    objects = [i for i in query.fetch(1000)]
+
+    self.response.headers['Content-Type'] = 'text/html'
+    self.response.out.write(template.render(
+      'templates/index.html', {'objects': objects}))
+
+
+class PlayPage(BasePage):
+  def get(self, gamekey):
+    if not self.setup(gamekey):
+      return
+
+    query = UsersElement.all(keys_only=True)
+    query.filter('game =', self.game)
+    query.filter('user =', self.user)
+    results = query.fetch(1000)
+    
+    # Populate the database
+    if not results:
+      for category_key in self.game.starting_categories:
+        category = Category.get(category_key)
+        UsersCategory.Create(self.user, self.game, category)
+
+      for element_key in self.game.starting_elements:
+        element = Element.get(element_key)
+        UsersElement.Create(self.user, self.game, element)
+
+
+    return self.render('templates/play.html', {})
+
+
 application = webapp.WSGIApplication(
-  [('/(.*)/elements',        ElementPage),
+  [('/',                     IndexPage),
+   ('/(.*)/play',            PlayPage),
+   ('/(.*)/edit',            GameEditPage),
+   ('/(.*)/elements',        ElementPage),
    ('/(.*)/elements/list',   ElementListPage),
    ('/(.*)/elements/edit',   ElementEditPage),
    ('/(.*)/elements/delete', ElementDeletePage),

@@ -13,6 +13,8 @@ class Game(db.Model):
   background = db.StringProperty()
   owner = db.UserProperty(required=True)
 
+  starting_categories = db.StringListProperty()
+  starting_elements = db.StringListProperty()
 
 class Category(db.Model):
   """How to group different elements together."""
@@ -20,7 +22,10 @@ class Category(db.Model):
   name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
   icon = db.StringProperty()
-
+  
+  @property
+  def key_str(self):
+    return str(self.key())
 
 class Element(db.Model):
   """Fundamental building blocks of the game.
@@ -33,6 +38,9 @@ class Element(db.Model):
   icon = db.StringProperty()
   category = db.ReferenceProperty(Category)
 
+  @property
+  def key_str(self):
+    return str(self.key())
 
 class Combination(db.Model):
   """The actual point of the game, to combined elements together to produce more

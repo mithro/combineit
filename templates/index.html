@@ -1,0 +1,21 @@
+<html>
+  <body>
+      <table>
+        <tr>
+          <th>Name</th><th></th>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><a href="/game/edit">New</a></td>
+        </tr>
+        {% for object in objects %}
+        <tr>
+            <td>{{ object.name }} </td>
+            <td><a href="/{{ object.key.name }}/edit?key={{ object.key }}">Edit</a></td>
+            <td><a href="/{{ object.key.name }}/play">Play</a></td>
+        </tr>
+        {% endfor %}
+      </table>
+  </body>
+</html>

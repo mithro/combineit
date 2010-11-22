@@ -70,6 +70,7 @@ class BasePage(webapp.RequestHandler):
     # Find the game object associated with this page..
     game = Game.all().filter('url =', gameurl).get()
     if not game:
+      raise ValueError('No game found %s' % gameurl)
       logging.warn('No game found %s', gameurl)
       return False
 
@@ -118,6 +119,12 @@ class CategoryDeletePage(DeletePage):
   url = "categories"
   klass = Category
 
+
+class ComboDeletePage(DeletePage):
+  url = "combo"
+  klass = Combination
+
+
 ###############################################################################
 ###############################################################################
 
@@ -135,7 +142,7 @@ class EditListPage(BasePage):
 
     logging.warn(objects)
 
-    self.render('templates/edit-list.html', 
+    self.render('templates/edit-list.html',
                 {'objects': objects, 'url': self.url})
 
 
@@ -148,10 +155,17 @@ class CategoryListPage(EditListPage):
   url = "categories"
   klass = Category
 
+
+class ComboListPage(EditListPage):
+  url = "combo"
+  klass = Combination
+
+
 ###############################################################################
 ###############################################################################
 
 class EditPage(BasePage):
+  fields = ("name", "description", "icon")
 
   def common(self, gameurl):
     if not self.setup(gameurl):
@@ -161,10 +175,9 @@ class EditPage(BasePage):
     if key:
       object = self.klass.get(key)
     else:
-      object = self.klass(game=self.game, name='Name goes here',
-                          description='Description goes here.')
+      object = self.klass(game=self.game)
 
-    for attr in "name", "description", "icon":
+    for attr in self.fields:
       attr_value = self.request.get(attr).strip()
       if attr_value:
         setattr(object, attr, attr_value)
@@ -213,6 +226,74 @@ class CategoryEditPage(EditPage):
   def render(self, category):
     EditPage.render(self, 'templates/edit-category.html',
                     {'object': category})
+
+
+class ComboEditPage(EditPage):
+  url = "combo"
+  klass = Combination
+  fields = ("name", "description")
+
+  def elements(self, name):
+    keys = self.request.get_all('%skeys' % name)
+
+    try:
+      toremove = int(self.request.get('%sremove' % name))
+      del keys[toremove]
+    except ValueError:
+      pass
+
+    toadd = self.request.get('%sadd' % name)
+    if toadd:
+      keys.append(toadd)
+
+    logging.info('%s %r', name, keys)
+
+    return Element.get(keys)
+
+  def post(self, gameurl):
+    combo = self.common(gameurl)
+    if not combo:
+      return
+
+    inputkeys = self.elements('input')
+    if inputkeys:
+      combo.inputkeys = [str(x.key()) for x in inputkeys]
+
+    outputkeys = self.elements('output')
+    if outputkeys:
+      combo.outputkeys = [str(x.key()) for x in outputkeys]
+
+    # Quick Create doesn't set this..
+    if self.request.get('action') == 'Save':
+      combo.put()
+
+    self.render(combo)
+
+  def render(self, combo):
+    query = Category.all()
+    query.filter('game =', self.game)
+    categories = query.fetch(1000)
+
+    selected_category = self.request.get('selected_category')
+    logging.info('selected_category %s', selected_category)
+    if selected_category.strip():
+      selected_category = Category.get(selected_category)
+    else:
+      selected_category = categories[0]
+
+    query = Element.all()
+    query.filter('game =', self.game)
+    query.filter('category =', selected_category)
+    elements = query.fetch(1000)
+
+    logging.info('input %r', combo.input())
+    logging.info('output %r', combo.output())
+
+    EditPage.render(self, 'templates/edit-combo.html',
+                    {'object': combo,
+                     'elements': elements,
+                     'categories': categories,
+                     'selected_category': selected_category})
 
 ###############################################################################
 ###############################################################################
@@ -358,13 +439,16 @@ class CombinePage(BasePage):
 
   It also returns if any of the elements or categories are new.
   """
-  def get(self, gameurl):
+  def post(self, gameurl):
     if not self.setup(gameurl):
       return
 
-    input = self.request.getall('to')
+    input = self.request.get_all('tocombined')
     input = list(sorted(input))
     logging.debug('input %s', input)
+    if not input:
+      self.render('templates/nocombine.html', {'code': 404, 'error': 'No input!'})
+      return
 
     query = Combination.all()
     for element in input:
@@ -392,7 +476,7 @@ class CombinePage(BasePage):
 
     categories = set()
     new_elements = set()
-    for element in combination.output:
+    for element in combination.output():
       categories.add(element.category)
 
       if UsersElement.Create(self.user, self.game, element):
@@ -426,7 +510,22 @@ class PlayPage(BasePage):
     if not self.setup(gameurl):
       return
 
-    tocombined = UsersElement.get(self.request.get_all('tocombined'))
+    tocombined = self.request.get_all('tocombined')
+
+    # We use an index for removal rather then keys like verything else so that
+    # if multiple items are in the list we remove the right one.
+    try:
+      toremove = int(self.request.get('toremove'))
+      del tocombined[toremove]
+    except ValueError:
+      pass
+
+    # Add any new item.
+    toadd = self.request.get('toadd')
+    if toadd:
+      tocombined.append(toadd)
+
+    tocombined = UsersElement.get(tocombined)
 
     categories_query = UsersCategory.all()
     categories_query.filter('game =', self.game)
@@ -445,23 +544,23 @@ class PlayPage(BasePage):
         element = Element.get(element_key)
         UsersElement.Create(self.user, self.game, element)
 
-    category_id = self.request.get('category')
-    if category_id:
-      category = Category.get(category_id)
-      assert category is not None
+    selected_category_id = self.request.get('selected_category')
+    if selected_category_id:
+      selected_category = Category.get(selected_category_id)
+      assert selected_category is not None
     else:
-      category = categories[0].reference
+      selected_category = categories[0].reference
 
     elements_query = UsersElement.all()
     elements_query.filter('game =', self.game)
     elements_query.filter('user =', self.user)
-    elements_query.filter('category =', category)
+    elements_query.filter('category =', selected_category)
     elements = elements_query.fetch(1000)
 
     return self.render('templates/play.html', {
         'tocombined': tocombined,
         'elements': elements,
-        'category': category,
+        'selected_category': selected_category,
         'categories': categories,
         })
 
@@ -495,6 +594,9 @@ application = webapp.WSGIApplication(
    ('/(.*)/categories/list', CategoryListPage),
    ('/(.*)/categories/edit', CategoryEditPage),
    ('/(.*)/categories/delete', CategoryDeletePage),
+   ('/(.*)/combo/list',      ComboListPage),
+   ('/(.*)/combo/edit',      ComboEditPage),
+   ('/(.*)/combo/delete',    ComboDeletePage),
    ('/(.*)/combine',         CombinePage),
    ('/(.*)/play',            PlayPage),
    ('/(.*)/abandon',         AbandonPage),

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block body %}
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function changeCategory( key )
+{
+  document.forms['scratch'].selected_category.value = key;
+  document.forms['scratch'].submit() ;
+}
+
+function addElement( form, key )
+{
+  document.forms['scratch'][form + 'add'].value = key;
+  document.forms['scratch'].submit() ;
+}
+
+function removeElement( form, key )
+{
+  document.forms['scratch'][form + 'remove'].value = key;
+  document.forms['scratch'].submit() ;
+}
+-->
+</script>
+
+    <a href="/{{ game.url }}/elements/list#">&lt; Back</a>
+    <form id="scratch" action="" method="post">
+      <input type="hidden" name="selected_category" value="{{ selected_category|key }}">
+
+      <table>
+
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name" value="{{ object.name }}"></td>
+        </tr><tr>
+          <td>Description:</td>
+          <td><textarea name="description">{{ object.description }}</textarea></td>
+
+        <tr>
+          <td colspan=2>
+            Add Elements from Category
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            <table>
+              <tr>
+                {% for category in categories %}
+                <td>
+                  <a href="#" onClick="changeCategory( '{{ category|key }}')">
+                    <img src="{{ category.icon }}"
+                         alt="{{ category.description }}">
+                    {% ifequal category|key selected_category|key %}
+                      <b>{{ category.name }}</b>
+                    {% else %}
+                      {{ category.name }}
+                    {% endifequal %}
+                  </a>
+                </td>
+                {% endfor %}
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan=2>
+            Input Elements
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            <table>
+              <tr>
+                <input type="hidden" name="inputadd" value="">
+                <input type="hidden" name="inputremove" value="">
+                {% for element in object.input %}
+                <td>
+                  <input type="hidden" name="inputkeys" value="{{ element|key }}">
+                  <a href="#" onClick="removeElement( 'input', '{{ forloop.counter0 }}')">
+                    <img src="{{ element.icon }}">
+                    {{ element.name }}
+                  </a>
+                </td>
+                {% endfor %}
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            Add input element
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            <table>
+              <tr>
+              {% for element in elements %}
+                <td>
+                  <a href="#" onClick="addElement('input', '{{ element|key }}')">
+                  <img src="{{ element.icon }}"
+                       alt="{{ element.description }}">
+                  {{ element.name }}
+                  </a>
+                </td>
+              {% endfor %}
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan=2>
+            Output Elements
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            <table>
+              <tr>
+                <input type="hidden" name="outputadd" value="">
+                <input type="hidden" name="outputremove" value="">
+                {% for element in object.output %}
+                <td>
+                  <input type="hidden" name="outputkeys" value="{{ element|key }}">
+                  <a href="#" onClick="removeElement( 'output', '{{ forloop.counter0 }}')">
+                    <img src="{{ element.icon }}">
+                    {{ element.name }}
+                  </a>
+                </td>
+                {% endfor %}
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+            Add output element
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2>
+
+            <table>
+              <tr>
+              {% for element in elements %}
+                <td>
+                  <a href="#" onClick="addElement('output', '{{ element|key }}')">
+                  <img src="{{ element.icon }}"
+                       alt="{{ element.description }}">
+                  {{ element.name }}
+                  </a>
+                </td>
+              {% endfor %}
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+        <tr>
+          <td><input type="submit" name="action" value="Save"></td>
+          <td><a href="/game/delete?key={{object|key}}#">Delete</a></td>
+        </tr>
+
+
+      </table>
+
+    </form>
+
+{% endblock %}

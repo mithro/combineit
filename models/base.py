@@ -14,8 +14,10 @@ class Game(db.Model):
   updated_on = db.DateTimeProperty(required=True, auto_now=True)
 
   url = db.StringProperty(required=True)
-  name = db.StringProperty(required=True)
-  description = db.StringProperty(multiline=True)
+  name = db.StringProperty(
+      required=True, default='Game name goes here')
+  description = db.StringProperty(
+      multiline=True, default='Game description goes here.')
   background = db.StringProperty()
   owner = db.UserProperty(required=True, auto_current_user_add=True)
 
@@ -32,8 +34,10 @@ class Category(db.Model):
   updated_on = db.DateTimeProperty(required=True, auto_now=True)
 
   game = db.ReferenceProperty(Game, required=True)
-  name = db.StringProperty(required=True)
-  description = db.StringProperty(multiline=True)
+  name = db.StringProperty(
+      required=True, default='Category name goes here')
+  description = db.StringProperty(
+      multiline=True, default='Category description goes here.')
 
   icon = db.StringProperty(default="/images/question-yellow.png")
 
@@ -52,8 +56,10 @@ class Element(db.Model):
   updated_on = db.DateTimeProperty(required=True, auto_now=True)
 
   game = db.ReferenceProperty(Game, required=True)
-  name = db.StringProperty(required=True)
-  description = db.StringProperty(multiline=True)
+  name = db.StringProperty(
+      required=True, default='Element name goes here')
+  description = db.StringProperty(
+      multiline=True, default='Element description goes here.')
 
   icon = db.StringProperty(default="/images/question-red.png")
 
@@ -73,18 +79,16 @@ class Combination(db.Model):
   updated_on = db.DateTimeProperty(required=True, auto_now=True)
 
   game = db.ReferenceProperty(Game, required=True)
-  name = db.StringProperty()
-  description = db.StringProperty(multiline=True)
+  name = db.StringProperty(
+      required=True, default='Combination name goes here')
+  description = db.StringProperty(
+      multiline=True, default='Combination description goes here.')
 
   inputkeys = db.StringListProperty()
   outputkeys = db.StringListProperty()
 
-  @property
   def input(self):
-    for key in self.inputkeys:
-      yield Element.get_by_key_name(key)
+    return Element.get(self.inputkeys)
 
-  @property
   def output(self):
-    for key in self.outputkeys:
-      yield Element.get_by_key_name(key)
+    return Element.get(self.outputkeys)

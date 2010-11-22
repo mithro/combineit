@@ -5,26 +5,41 @@
 
 <script language="JavaScript" type="text/javascript">
 <!--
-function changeCategory ( key )
+function changeCategory( key )
 {
-  document.forms['form'].category.value = key;
-  document.forms['form'].submit() ;
+  document.forms['scratch'].selected_category.value = key;
+  document.forms['scratch'].submit() ;
+}
+
+function addElement( key )
+{
+  document.forms['scratch'].toadd.value = key;
+  document.forms['scratch'].submit() ;
+}
+
+function removeElement( key )
+{
+  document.forms['scratch'].toremove.value = key;
+  document.forms['scratch'].submit() ;
 }
 -->
 </script>
 
-    <form id="form" action="" method="post">
-    <input type="hidden" name="category" value="{{ category|key }}">
+<form id="scratch" action="/{{ game.url }}/play" method="post">
+    <input type="hidden" name="selected_category" value="{{ selected_category|key }}">
+    <input type="hidden" name="toadd" value="">
+    <input type="hidden" name="toremove" value="">
     <table>
       <tr>
-        {% for element in tocombined %}
+        {% for userelement in tocombined %}
         <td>
-          <input type="hidden" name="to" value="{{ element|key }}">
-          <img src="{{ element.icon }}">
-          {{ element.name }}
+          <input type="hidden" name="tocombined" value="{{ userelement|key }}">
+          <a href="#" onClick="removeElement( '{{ forloop.counter0 }}')">
+            <img src="{{ userelement.reference.icon }}">
+            {{ userelement.reference.name }}
+          </a>
         </td>
         {% endfor %}
-        <td><input type="submit" value="combine"></td>
       </tr>
 
       {% for usercategory in categories %}
@@ -32,22 +47,24 @@ function changeCategory ( key )
         <td>
           <a href="#" onClick="changeCategory(
             '{{ usercategory.reference|key }}')">
-          <img src="{{ usercategory.reference.icon }}"
-               alt="{{ usercategory.reference.description }}">
-          {% ifequal usercategory.reference|key category|key %}
-            <b>{{ usercategory.reference.name }}</b>
-          {% else %}
-            {{ usercategory.reference.name }}
-          {% endifequal %}
+            <img src="{{ usercategory.reference.icon }}"
+                 alt="{{ usercategory.reference.description }}">
+            {% ifequal usercategory.reference|key selected_category|key %}
+              <b>{{ usercategory.reference.name }}</b>
+            {% else %}
+              {{ usercategory.reference.name }}
+            {% endifequal %}
           </a>
         </td>
         {% ifequal forloop.counter0 0 %}
         <td rowspan="{{ categories|length }}">
           {% for userelement in elements %}
           <div>
-            <img src="{{ userelement.reference.icon }}"
-                 alt="{{ userelement.reference.description }}">
-            {{ userelement.reference.name }}
+            <a href="#" onClick="addElement('{{ userelement|key }}')">
+              <img src="{{ userelement.reference.icon }}"
+                   alt="{{ userelement.reference.description }}">
+              {{ userelement.reference.name }}
+            </a>
           </div>
           {% endfor %}
         </td>
@@ -57,5 +74,20 @@ function changeCategory ( key )
     </table>
   </form>
 
+  <form id="actual" action="/{{ game.url }}/combine" method="post">
+    <input type="submit" name="action" value="Combine">
+    {% for userelement in tocombined %}
+      <input type="hidden" name="tocombined" value="{{ userelement.reference|key }}">
+    {% endfor %}
+  </form>
+
+  <form id="actual" action="/{{ game.url }}/combo/edit" method="post">
+    <input type="submit" name="action" value="Quick Create">
+    <input type="hidden" name="selected_category"
+           value="{{ selected_category|key }}">
+    {% for userelement in tocombined %}
+      <input type="hidden" name="inputkeys" value="{{ userelement.reference|key }}">
+    {% endfor %}
+  </form>
   </body>
 </html>

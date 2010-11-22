@@ -2,7 +2,7 @@
   <body>
     <a href="/">&lt; Back</a>
     <form method="POST" action="/game/edit">
-      <input name="key" type="hidden" value="{{ object.key }}">
+      <input name="key" type="hidden" value="{{ object|key }}">
       <table>
         <tr>
           <td>URL:</td>
@@ -21,9 +21,9 @@
           <td>
             <select name="starting_categories" multiple>
             {% for category in categories %}
-              <option value="{{ category.key }}" 
+              <option value="{{ category|key }}" 
 {% for selected in object.starting_categories %}
-{% ifequal category.key_str selected %}
+{% ifequal category|key selected %}
    selected
 {% endifequal %}
 {% endfor %}
@@ -36,9 +36,9 @@
           <td>
             <select name="starting_elements" multiple>
             {% for element in elements %}
-              <option value="{{ element.key }}" 
+              <option value="{{ element|key }}" 
 {% for selected in object.starting_elements %}
-{% ifequal element.key_str selected %}
+{% ifequal element|key selected %}
    selected
 {% endifequal %}
 {% endfor %}
@@ -47,8 +47,14 @@
             </select>
           </td>
         </tr><tr>
+          <td>Icon:</td>
+          <td><input type="text" name="icon" value="{{ object.icon }}" 
+            onchange="document.getElementById('icon-preview').src = this.value;"></td>
+        </tr><tr>
+          <td colspan="2"><img id="icon-preview" src="{{ object.icon }}" height="256" width="256"></td>
+        </tr><tr>
           <td><input type="submit" value="Save"></td>
-          <td><a href="/game/delete?key={{object.key}}">Delete</a></td>
+          <td><a href="/game/delete?key={{object|key}}">Delete</a></td>
         </tr>
       </table>
     </form>

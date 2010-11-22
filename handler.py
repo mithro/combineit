@@ -3,19 +3,26 @@
 
 """This module represents what people have voted for."""
 
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
+from google.appengine.dist import use_library
+use_library('django', '1.1')
 
 import pprint
 import logging
 import re
 
 from google.appengine.api import users
+from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 import json
 
-from google.appengine.ext import db
+import django_extra
+
 from models.base import *
 from models.peruser import *
 
@@ -146,36 +153,71 @@ class CategoryListPage(EditListPage):
 
 class EditPage(BasePage):
 
-  def get(self, gameurl):
+  def common(self, gameurl):
     if not self.setup(gameurl):
       return
-
-    logging.debug('EditPage for %s', self.klass)
 
     key = self.request.get('key')
-    try:
+    if key:
       object = self.klass.get(key)
-    except db.BadKeyError:
-      object = None
-
-    self.render(object)
-
-  def post(self, gameurl):
-    if not self.setup(gameurl):
-      return
-
-    try:
-      object = self.klass.get(self.request.get('key'))
-    except db.BadKeyError:
-      object = self.klass(game=self.game, name='New', desc='New')
+    else:
+      object = self.klass(game=self.game, name='Name goes here',
+                          description='Description goes here.')
 
     for attr in "name", "description", "icon":
-      setattr(object, attr, self.request.get(attr))
+      attr_value = self.request.get(attr).strip()
+      if attr_value:
+        setattr(object, attr, attr_value)
 
     return object
 
+  def get(self, gameurl):
+    object = self.common(gameurl)
+    if not object:
+      return
 
-class GameEditPage(BasePage):
+    self.render(object)
+
+
+class ElementEditPage(EditPage):
+  url = "elements"
+  klass = Element
+
+  def post(self, gameurl):
+    element = self.common(gameurl)
+    element.category = Category.get(self.request.get('category'))
+    element.put()
+
+    self.render(element)
+
+  def render(self, element):
+    query = Category.all()
+    query.filter('game =', self.game)
+    categories = query.fetch(1000)
+
+    EditPage.render(self, 'templates/edit-element.html',
+                    {'object': element,
+                     'categories': categories})
+
+
+class CategoryEditPage(EditPage):
+  url = "categories"
+  klass = Category
+
+  def post(self, gameurl):
+    category = self.common(gameurl)
+    category.put()
+
+    self.render(category)
+
+  def render(self, category):
+    EditPage.render(self, 'templates/edit-category.html',
+                    {'object': category})
+
+###############################################################################
+###############################################################################
+
+class GamePage(BasePage):
   def setup(self):
     # User needs to be logged in
     user = users.get_current_user()
@@ -188,19 +230,10 @@ class GameEditPage(BasePage):
     self.game = None
     return True
 
-  def get(self):
-    if not self.setup():
-      return
 
-    key = self.request.get('key')
-    try:
-      game = Game.get(key)
-    except db.BadKeyError:
-      game = None
+class GameEditPage(GamePage):
 
-    self.render(game)
-
-  def post(self):
+  def common(self):
     if not self.setup():
       return
 
@@ -214,31 +247,59 @@ class GameEditPage(BasePage):
       if str(result.key()) != self.request.get('key'):
         raise ValueError('URL is already in us, pick another url.')
 
-    # Get the game object
-    try:
+    key = self.request.get('key')
+    if key:
       game = Game.get(self.request.get('key'))
-    except db.BadKeyError:
-      game = Game(name='New', desc='New', url=url)
+    else:
+      game = Game(name='Name goes here',
+                  description='Description goes here.',
+                  url='newurl')
 
-    game.url = url
+    if url:
+      game.url = url
 
     for attr in "name", "description", "icon":
-      setattr(game, attr, self.request.get(attr))
+      attr_value = self.request.get(attr).strip()
+      if attr_value:
+        setattr(game, attr, attr_value)
 
-    game.starting_categories = self.request.get_all('starting_categories')
-    game.starting_elements = self.request.get_all('starting_elements')
-    game.put()
+    starting_categories = self.request.get_all('starting_categories')
+    if starting_categories:
+      game.starting_categories = starting_categories
+
+    starting_elements = self.request.get_all('starting_elements')
+    if starting_elements:
+      game.starting_elements = starting_elements
+
+    return game
+
+  def get(self):
+    game = self.common()
+    if not game:
+      return
 
     self.render(game)
 
-  def render(self, game):
-    query = Category.all()
-    query.filter('game =', game)
-    categories = query.fetch(1000)
+  def post(self):
+    game = self.common()
+    if not game:
+      return
 
-    query = Element.all()
-    query.filter('game =', game)
-    elements = query.fetch(1000)
+    game.put()
+    self.render(game)
+
+  def render(self, game):
+    try:
+      query = Category.all()
+      query.filter('game =', game)
+      categories = query.fetch(1000)
+
+      query = Element.all()
+      query.filter('game =', game)
+      elements = query.fetch(1000)
+    except db.NotSavedError, e:
+      categories = []
+      elements = []
 
     BasePage.render(
        self, 'templates/edit-game.html',
@@ -249,42 +310,16 @@ class GameEditRedirect(webapp.RequestHandler):
   def get(self, gameurl):
     self.redirect('/game/edit?key=%s' % self.request.get('key'))
 
+class GameDeletePage(GamePage):
+  def get(self):
+    if not self.setup():
+      return
 
+    key = self.request.get('key')
+    object = Game.get(key)
+    object.delete()
+    self.redirect('/')
 
-class ElementEditPage(EditPage):
-  url = "elements"
-  klass = Element
-
-  def post(self, gameurl):
-    element = EditPage.post(self, gameurl)
-    element.category = Category.get(self.request.get('category'))
-    element.key = element.put()
-
-    self.render(element)
-
-  def render(self, element):
-    query = Category.all()
-    query.filter('game =', self.game)
-    categories = query.fetch(1000)
-
-    EditPage.render(self, 'templates/edit-element.html', 
-                    {'object': element,
-                     'categories': categories})
-
-
-class CategoryEditPage(EditPage):
-  url = "categories"
-  klass = Category
-
-  def post(self, gameurl):
-    category = EditPage.post(self, gameurl)
-    category.put()
-
-    self.render(category)
-
-  def render(self, category):
-    EditPage.render(self, 'templates/edit-category.html', 
-                    {'object': category})
 
 ###############################################################################
 ###############################################################################
@@ -327,7 +362,7 @@ class CombinePage(BasePage):
     if not self.setup(gameurl):
       return
 
-    input = self.request.get('to').split(',')
+    input = self.request.getall('to')
     input = list(sorted(input))
     logging.debug('input %s', input)
 
@@ -387,27 +422,67 @@ class IndexPage(webapp.RequestHandler):
 
 
 class PlayPage(BasePage):
-  def get(self, gameurl):
+  def post(self, gameurl):
     if not self.setup(gameurl):
       return
 
-    query = UsersElement.all(keys_only=True)
-    query.filter('game =', self.game)
-    query.filter('user =', self.user)
-    results = query.fetch(1000)
+    tocombined = UsersElement.get(self.request.get_all('tocombined'))
+
+    categories_query = UsersCategory.all()
+    categories_query.filter('game =', self.game)
+    categories_query.filter('user =', self.user)
+    categories = categories_query.fetch(1000)
 
     # Populate the database
-    if not results:
+    if not categories:
       for category_key in self.game.starting_categories:
         category = Category.get(category_key)
-        UsersCategory.Create(self.user, self.game, category)
+
+        categories.append(
+            UsersCategory.Create(self.user, self.game, category))
 
       for element_key in self.game.starting_elements:
         element = Element.get(element_key)
         UsersElement.Create(self.user, self.game, element)
 
+    category_id = self.request.get('category')
+    if category_id:
+      category = Category.get(category_id)
+      assert category is not None
+    else:
+      category = categories[0].reference
 
-    return self.render('templates/play.html', {})
+    elements_query = UsersElement.all()
+    elements_query.filter('game =', self.game)
+    elements_query.filter('user =', self.user)
+    elements_query.filter('category =', category)
+    elements = elements_query.fetch(1000)
+
+    return self.render('templates/play.html', {
+        'tocombined': tocombined,
+        'elements': elements,
+        'category': category,
+        'categories': categories,
+        })
+
+  get = post
+
+class AbandonPage(BasePage):
+  def get(self, gameurl):
+    if not self.setup(gameurl):
+      return
+
+    categories_query = UsersCategory.all(keys_only=True)
+    categories_query.filter('game =', self.game)
+    categories_query.filter('user =', self.user)
+    db.delete(categories_query.fetch(1000))
+
+    elements_query = UsersElement.all(keys_only=True)
+    elements_query.filter('game =', self.game)
+    elements_query.filter('user =', self.user)
+    db.delete(elements_query.fetch(1000))
+
+    self.redirect('/')
 
 
 application = webapp.WSGIApplication(
@@ -422,7 +497,9 @@ application = webapp.WSGIApplication(
    ('/(.*)/categories/delete', CategoryDeletePage),
    ('/(.*)/combine',         CombinePage),
    ('/(.*)/play',            PlayPage),
+   ('/(.*)/abandon',         AbandonPage),
    ('/game/edit',            GameEditPage),
+   ('/game/delete',          GameDeletePage),
    ('/(.*)/edit',            GameEditRedirect),
    ('/populate',             PopulatePage),
    ],

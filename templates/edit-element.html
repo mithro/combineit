@@ -2,7 +2,7 @@
   <body>
     <a href="/{{ game.url }}/elements/list">&lt; Back</a>
     <form method="POST" action="/{{ game.url }}/elements/edit">
-      <input name="key" type="hidden" value="{{ object.key }}">
+      <input name="key" type="hidden" value="{{ object|key }}">
       <table>
         <tr>
           <td>Name:</td>
@@ -21,7 +21,7 @@
           <td>
             <select name="category" onchange="document.getElementById('category-preview').src = this.options[this.selectedIndex].getAttribute('src');">
             {% for category in categories %}
-              <option value="{{ category.key }}" {% ifequal category.key object.category.key %} selected {% endifequal %}
+              <option value="{{ category|key }}" {% ifequal category|key object.category|key %} selected {% endifequal %}
                       src="{{ category.icon }}">{{ category.name }}</option>
             {% endfor %}
             </select>
@@ -30,7 +30,7 @@
           <td colspan="2"><img id="category-preview" src="{{ object.category.icon }}" height="256" width="256"></td>
         </tr><tr>
           <td><input type="submit" value="Save"></td>
-          <td><a href="/{{ game.url }}/categories/delete?key={{category.key}}">Delete</a></td>
+          <td><a href="/{{ game.url }}/categories/delete?key={{category|key}}">Delete</a></td>
         </tr>
       </table>
     </form>

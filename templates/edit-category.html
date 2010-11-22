@@ -2,7 +2,7 @@
   <body>
     <a href="/{{ game.url }}/categories/list">&lt; Back</a>
     <form method="POST" action="/{{ game.url }}/categories/edit">
-      <input name="key" type="hidden" value="{{ object.key }}">
+      <input name="key" type="hidden" value="{{ object|key }}">
       <table>
         <tr>
           <td>Name:</td>
@@ -18,7 +18,7 @@
           <td colspan="2"><img id="icon-preview" src="{{ object.icon }}" height="256" width="256"></td>
         </tr><tr>
           <td><input type="submit" value="Save"></td>
-          <td><a href="/{{ game.url }}/categories/delete?key={{object.key}}">Delete</a></td>
+          <td><a href="/{{ game.url }}/categories/delete?key={{object|key}}">Delete</a></td>
         </tr>
       </table>
     </form>

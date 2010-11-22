@@ -1,13 +1,61 @@
 <html>
   <body>
+
+    <a href="/{{ game.url }}/abandon">Restart Game</a>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function changeCategory ( key )
+{
+  document.forms['form'].category.value = key;
+  document.forms['form'].submit() ;
+}
+-->
+</script>
+
+    <form id="form" action="" method="post">
+    <input type="hidden" name="category" value="{{ category|key }}">
     <table>
       <tr>
-        <td colspan=2><iframe id="status" src=""></iframe></td>
-        <td><a href="#" onclick="false;">Submit</a></td>
-      </tr><tr>
-        <td><iframe id="categories" src="/{{ game.url }}/categories"></iframe></td>
-        <td colspan=2><iframe id="elements" src="/{{ game.url }}/elements"></iframe></td>
+        {% for element in tocombined %}
+        <td>
+          <input type="hidden" name="to" value="{{ element|key }}">
+          <img src="{{ element.icon }}">
+          {{ element.name }}
+        </td>
+        {% endfor %}
+        <td><input type="submit" value="combine"></td>
       </tr>
+
+      {% for usercategory in categories %}
+      <tr>
+        <td>
+          <a href="#" onClick="changeCategory(
+            '{{ usercategory.reference|key }}')">
+          <img src="{{ usercategory.reference.icon }}"
+               alt="{{ usercategory.reference.description }}">
+          {% ifequal usercategory.reference|key category|key %}
+            <b>{{ usercategory.reference.name }}</b>
+          {% else %}
+            {{ usercategory.reference.name }}
+          {% endifequal %}
+          </a>
+        </td>
+        {% ifequal forloop.counter0 0 %}
+        <td rowspan="{{ categories|length }}">
+          {% for userelement in elements %}
+          <div>
+            <img src="{{ userelement.reference.icon }}"
+                 alt="{{ userelement.reference.description }}">
+            {{ userelement.reference.name }}
+          </div>
+          {% endfor %}
+        </td>
+        {% endifequal %}
+      </tr>
+      {% endfor %}
     </table>
+  </form>
+
   </body>
 </html>

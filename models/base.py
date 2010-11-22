@@ -19,6 +19,8 @@ class Game(db.Model):
   background = db.StringProperty()
   owner = db.UserProperty(required=True, auto_current_user_add=True)
 
+  icon = db.StringProperty(default="/images/question-green.png")
+
   starting_categories = db.StringListProperty()
   starting_elements = db.StringListProperty()
 
@@ -33,7 +35,7 @@ class Category(db.Model):
   name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
 
-  icon = db.StringProperty()
+  icon = db.StringProperty(default="/images/question-yellow.png")
 
   @property
   def key_str(self):
@@ -53,7 +55,8 @@ class Element(db.Model):
   name = db.StringProperty(required=True)
   description = db.StringProperty(multiline=True)
 
-  icon = db.StringProperty()
+  icon = db.StringProperty(default="/images/question-red.png")
+
   category = db.ReferenceProperty(Category)
 
   @property

@@ -1,20 +1,23 @@
 <html>
   <body>
     <a href="/">&lt; Back</a>
-    <form method="POST" action="/{{ object.key.name }}/edit">
+    <form method="POST" action="/game/edit">
       <input name="key" type="hidden" value="{{ object.key }}">
       <table>
         <tr>
+          <td>URL:</td>
+          <td><input type="text" name="url" value="{{ object.url }}"></td>
+        </tr><tr>
           <td>Name:</td>
           <td><input type="text" name="name" value="{{ object.name }}"></td>
         </tr><tr>
           <td>Description:</td>
           <td><textarea name="description">{{ object.description }}</textarea></td>
         </tr><tr>
-          <td><a href="/{{ object.key.name }}/elements/list">Elements</a></td>
-          <td><a href="/{{ object.key.name }}/categories/list">Categories</a></td>
+          <td><a href="/{{ object.url }}/categories/list">Categories</a></td>
+          <td><a href="/{{ object.url }}/elements/list">Elements</a></td>
         </tr><tr>
-          <td>Category:</td>
+          <td>Starting<br>Categories:</td>
           <td>
             <select name="starting_categories" multiple>
             {% for category in categories %}
@@ -29,7 +32,7 @@
             </select>
           </td>
         </tr><tr>
-          <td>Elements:</td>
+          <td>Starting<br>Elements:</td>
           <td>
             <select name="starting_elements" multiple>
             {% for element in elements %}
@@ -45,7 +48,7 @@
           </td>
         </tr><tr>
           <td><input type="submit" value="Save"></td>
-          <td><a href="/{{ object.key.name }}/delete?key={{object.key}}">Delete</a></td>
+          <td><a href="/game/delete?key={{object.key}}">Delete</a></td>
         </tr>
       </table>
     </form>

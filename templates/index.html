@@ -9,11 +9,11 @@
             <td></td>
             <td><a href="/game/edit">New</a></td>
         </tr>
-        {% for object in objects %}
+        {% for game in games %}
         <tr>
-            <td>{{ object.name }} </td>
-            <td><a href="/{{ object.key.name }}/edit?key={{ object.key }}">Edit</a></td>
-            <td><a href="/{{ object.key.name }}/play">Play</a></td>
+            <td>{{ game.name }} </td>
+            <td><a href="/{{ game.url }}/edit?key={{ game.key }}">Edit</a></td>
+            <td><a href="/{{ game.url }}/play">Play</a></td>
         </tr>
         {% endfor %}
       </table>

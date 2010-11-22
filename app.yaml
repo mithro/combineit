@@ -16,4 +16,4 @@ handlers:
 
 - url: /.*
   script: handler.py
-
+  login: required

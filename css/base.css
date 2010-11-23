@@ -166,3 +166,62 @@ a {
   padding-bottom: 1.7em;
 }
 
+#body table {
+  width: 100%;
+}
+
+table.bench {
+  height: 150px;
+  width: 100%;
+  border: 1px solid black;
+}
+
+.button {
+  width: 150px;
+  height: 150px;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+
+  border: 1px solid black;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -khtml-border-radius: 20px;
+  border-radius: 20px;
+
+}
+
+td.category {
+  width: 150px;
+}
+
+td.selected {
+  border-left: 1px solid black; 
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+td.notselected {
+  border-right: 1px solid black;
+  background: #eeeeee;
+}
+
+td.element {
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+
+div.icon {
+  width: 150px;
+  text-align: center;
+
+  font-size: 12pt;
+}
+
+div.icon img {
+  width: 128px;
+  height: 128px;
+  margin-left: 11px;
+  margin-right: 11px;
+}

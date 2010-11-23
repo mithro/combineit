@@ -16,19 +16,19 @@
     <div id="header" class="chrome">
       <ul class="left">
         <li {% ifequal path '/' %}class='current'{%endifequal%}><a href="/#">Home</a></li>
-        <li>Featured Games <span class=small>&#9660;</span>
+        <li>Featured <span class=small>&#9660;</span>
           <ul>
             {% for g in featured_games %}
             <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
             {% endfor %}
           </ul></li>
-        <li>Popular Games <span class=small>&#9660;</span>
+        <li>Popular <span class=small>&#9660;</span>
           <ul>
             {% for g in popular_games %}
             <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
             {% endfor %}
           </ul></li>
-        <li>Currently Playing <span class=small>&#9660;</span>
+        <li>Playing <span class=small>&#9660;</span>
           <ul>
             {% for g in current_games %}
             <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>

@@ -28,43 +28,49 @@ function removeElement( key )
     <input type="hidden" name="selected_category" value="{{ selected_category|key }}">
     <input type="hidden" name="toadd" value="">
     <input type="hidden" name="toremove" value="">
-    <table>
-      <tr style="border: 1px solid red;">
+    <table class="bench">
+      <tr>
         {% for userelement in tocombined %}
-        <td>
+        <td colspan=2>
           <div>
             <input type="hidden" name="tocombined" value="{{ userelement|key }}">
             <a href="#" onClick="removeElement( '{{ forloop.counter0 }}')">
-              <img src="{{ userelement.reference.icon }}">
-              {{ userelement.reference.name }}
+              {{ userelement|icon }}
             </a>
           </div>
         </td>
         {% endfor %}
+        <td class="category bench">
+          <div class="button">
+            <a href="#" onClick="document.forms.bench.submit()">
+              Submit
+            </a>
+          </div>
+        </td>
       </tr>
+     </table>
 
+     <table>
       {% for usercategory in categories %}
       <tr>
-        <td>
-          <a href="#" onClick="changeCategory(
-            '{{ usercategory.reference|key }}')">
-            <img src="{{ usercategory.reference.icon }}"
-                 alt="{{ usercategory.reference.description }}">
-            {% ifequal usercategory.reference|key selected_category|key %}
-              <b>{{ usercategory.reference.name }}</b>
-            {% else %}
-              {{ usercategory.reference.name }}
-            {% endifequal %}
+
+        {% ifequal usercategory.reference|key selected_category|key %}
+        <td class="category selected">
+        {% else %}
+        <td class="category notselected">
+        {% endifequal %}
+
+	  <a href="#" onClick="changeCategory('{{ usercategory.reference|key }}')">
+	    {{ usercategory|icon }}
           </a>
         </td>
+
         {% ifequal forloop.counter0 0 %}
-        <td rowspan="{{ categories|length }}">
+        <td class="element" rowspan="{{ categories|length }}">
           {% for userelement in elements %}
           <div>
             <a href="#" onClick="addElement('{{ userelement|key }}')">
-              <img src="{{ userelement.reference.icon }}"
-                   alt="{{ userelement.reference.description }}">
-              {{ userelement.reference.name }}
+	      {{ userelement|icon }}
             </a>
           </div>
           {% endfor %}
@@ -75,7 +81,7 @@ function removeElement( key )
     </table>
   </form>
 
-  <form id="actual" action="/{{ game.url }}/combine" method="post">
+  <form id="bench" action="/{{ game.url }}/combine" method="post">
     <input type="submit" name="action" value="Combine">
     {% for userelement in tocombined %}
       <input type="hidden" name="tocombined" value="{{ userelement.reference|key }}">

@@ -1,7 +1,6 @@
-<html>
-  <body>
-
-    <a href="/{{ game.url }}/abandon">Restart Game</a>
+{% extends "base.html" %}
+{% block body %}
+    <a href="/{{ game.url }}/abandon#">Restart Game</a>
 
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -25,19 +24,21 @@ function removeElement( key )
 -->
 </script>
 
-<form id="scratch" action="/{{ game.url }}/play" method="post">
+<form id="scratch" action="/{{ game.url }}/play#" method="post">
     <input type="hidden" name="selected_category" value="{{ selected_category|key }}">
     <input type="hidden" name="toadd" value="">
     <input type="hidden" name="toremove" value="">
     <table>
-      <tr>
+      <tr style="border: 1px solid red;">
         {% for userelement in tocombined %}
         <td>
-          <input type="hidden" name="tocombined" value="{{ userelement|key }}">
-          <a href="#" onClick="removeElement( '{{ forloop.counter0 }}')">
-            <img src="{{ userelement.reference.icon }}">
-            {{ userelement.reference.name }}
-          </a>
+          <div>
+            <input type="hidden" name="tocombined" value="{{ userelement|key }}">
+            <a href="#" onClick="removeElement( '{{ forloop.counter0 }}')">
+              <img src="{{ userelement.reference.icon }}">
+              {{ userelement.reference.name }}
+            </a>
+          </div>
         </td>
         {% endfor %}
       </tr>
@@ -81,13 +82,16 @@ function removeElement( key )
     {% endfor %}
   </form>
 
-  <form id="actual" action="/{{ game.url }}/combo/edit" method="post">
-    <input type="submit" name="action" value="Quick Create">
+
+  <form id="quickcreate" action="/{{ game.url }}/combo/edit" method="post">
     <input type="hidden" name="selected_category"
            value="{{ selected_category|key }}">
     {% for userelement in tocombined %}
       <input type="hidden" name="inputkeys" value="{{ userelement.reference|key }}">
     {% endfor %}
   </form>
-  </body>
-</html>
+
+{% endblock %}
+{% block admin %}
+   <li><a href="#" onClick="document.forms.quickcreate.submit()">Quick Create</a></li>
+{% endblock %}

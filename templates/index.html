@@ -1,5 +1,5 @@
-<html>
-  <body>
+{% extends "base.html" %}
+{% block body %}
       <table>
         <tr>
           <th>Name</th><th></th>
@@ -7,16 +7,15 @@
         <tr>
             <td></td>
             <td></td>
-            <td><a href="/game/edit">New</a></td>
+            <td><a href="/game/edit#">New</a></td>
         </tr>
         {% for game in games %}
         <tr>
             <td><img src="{{ game.icon }}"></td>
             <td>{{ game.name }} </td>
-            <td><a href="/{{ game.url }}/edit?key={{ game.key }}">Edit</a></td>
-            <td><a href="/{{ game.url }}/play">Play</a></td>
+            <td><a href="/{{ game.url }}/edit?key={{ game.key }}#">Edit</a></td>
+            <td><a href="/{{ game.url }}/play#">Play</a></td>
         </tr>
         {% endfor %}
       </table>
-  </body>
-</html>
+{% endblock %}

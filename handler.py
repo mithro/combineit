@@ -12,6 +12,7 @@ use_library('django', '1.1')
 import pprint
 import logging
 import re
+import urlparse
 
 from google.appengine.api import users
 from google.appengine.ext import db
@@ -25,57 +26,22 @@ import django_extra
 
 from models.base import *
 from models.peruser import *
-
-
-
-class PopulatePage(webapp.RequestHandler):
-  def get(self):
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
-
-    game = Game(name='test', owner=user, key_name='testgame1')
-    game.put()
-
-    for i in range(0, 3):
-      cat = Category(game=game, name='Category %s'%i, key_name='cat%s'%i)
-      cat.put()
-
-      for j in range(0, 3):
-        element = Element(
-            game=game,
-            name='Element %i in Category %i' % (j, i),
-            category=cat,
-            key_name='element%s%s' % (i,j))
-        element.put()
-
-    combine = Combination(
-        key_name="comb1",
-        game=game,
-        inputkeys=['element00', 'element01'],
-        outputkeys=['element02'])
-    combine.put()
+from models.stats import *
 
 
 class BasePage(webapp.RequestHandler):
+  title = ''
+
   def setup(self, gameurl):
+    self.game = None
+
     # User needs to be logged in
-    user = users.get_current_user()
-    logging.debug("User %s", user)
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return False
+    self.user = users.get_current_user()
 
     # Find the game object associated with this page..
-    game = Game.all().filter('url =', gameurl).get()
-    if not game:
-      raise ValueError('No game found %s' % gameurl)
-      logging.warn('No game found %s', gameurl)
+    self.game = Game.all().filter('url =', gameurl).get()
+    if not self.game:
       return False
-
-    self.user = user
-    self.game = game
 
     return True
 
@@ -84,23 +50,62 @@ class BasePage(webapp.RequestHandler):
 
     if output == 'json':
       self.response.headers['Content-Type'] = 'application/json'
-
       self.response.out.write(json.JSONEncoder().encode(result))
 
     elif output == 'text':
       self.response.headers['Content-Type'] = 'text/plain'
       self.response.out.write(pprint.pformat(result))
-    else:
-      result['game'] = self.game
-      result['user'] = self.user
 
-      self.response.headers['Content-Type'] = 'text/html'
+    else:
+      logging.info('url %s', urlparse.urlparse(self.request.uri).path)
+
+
+      result.update({
+          'title': self.title,
+          'path': urlparse.urlparse(self.request.uri).path,
+          'login_url': users.create_login_url(self.request.uri),
+          'logout_url': users.create_logout_url(self.request.uri),
+          'game': self.game,
+          'user': self.user,
+          'is_current_user_admin': users.is_current_user_admin(),
+          'featured_games': FeaturedGame.all().fetch(10),
+          'top_games': [],
+          })
+
+      self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
       self.response.out.write(template.render(tmpl, result))
 
+
+class LoginPage(BasePage):
+  def setup(self, gameurl):
+    result = BasePage.setup(self, gameurl)
+
+    if self.user is None:
+      self.redirect(users.create_login_url(self.request.uri))
+      return False
+
+    return result
+
+
 ###############################################################################
 ###############################################################################
 
-class DeletePage(BasePage):
+
+class IndexPage(BasePage):
+  def get(self):
+    self.setup('')
+
+    query = Game.all()
+    games = [i for i in query.fetch(1000)]
+
+    self.render(
+        'templates/index.html', {'games': games})
+
+
+###############################################################################
+###############################################################################
+
+class DeletePage(LoginPage):
   def get(self, gameurl):
     if not self.setup(gameurl):
       return
@@ -128,7 +133,9 @@ class ComboDeletePage(DeletePage):
 ###############################################################################
 ###############################################################################
 
-class EditListPage(BasePage):
+class EditListPage(LoginPage):
+  title = 'Edit List'
+
   def get(self, gameurl):
     if not self.setup(gameurl):
       return
@@ -164,7 +171,8 @@ class ComboListPage(EditListPage):
 ###############################################################################
 ###############################################################################
 
-class EditPage(BasePage):
+class EditPage(LoginPage):
+  title = 'Edit'
   fields = ("name", "description", "icon")
 
   def common(self, gameurl):
@@ -298,21 +306,14 @@ class ComboEditPage(EditPage):
 ###############################################################################
 ###############################################################################
 
-class GamePage(BasePage):
+class GamePage(LoginPage):
   def setup(self):
-    # User needs to be logged in
-    user = users.get_current_user()
-    logging.debug("User %s", user)
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return False
-
-    self.user = user
-    self.game = None
-    return True
+    LoginPage.setup(self, '')
+    return bool(self.user)
 
 
 class GameEditPage(GamePage):
+  title = 'Edit Game'
 
   def common(self):
     if not self.setup():
@@ -382,7 +383,7 @@ class GameEditPage(GamePage):
       categories = []
       elements = []
 
-    BasePage.render(
+    LoginPage.render(
        self, 'templates/edit-game.html',
        {'object': game, 'categories': categories, 'elements': elements})
 
@@ -405,7 +406,7 @@ class GameDeletePage(GamePage):
 ###############################################################################
 ###############################################################################
 
-class ElementPage(BasePage):
+class ElementPage(LoginPage):
   """Get a list of elements for a user."""
   def get(self, gameurl):
     if not self.setup(gameurl):
@@ -419,7 +420,7 @@ class ElementPage(BasePage):
         'results': [i.reference for i in query.fetch(1000)]})
 
 
-class CategoryPage(BasePage):
+class CategoryPage(LoginPage):
   """Get a list of categories for a user."""
   def get(self, gameurl):
     if not self.setup(gameurl):
@@ -433,7 +434,7 @@ class CategoryPage(BasePage):
         'results': [i.reference for i in query.fetch(1000)]})
 
 
-class CombinePage(BasePage):
+class CombinePage(LoginPage):
   """This page actually does all the work, it takes a list of elements to
   combind and returns if the combination is successful.
 
@@ -495,17 +496,7 @@ class CombinePage(BasePage):
          'new_categories': new_categories})
 
 
-class IndexPage(webapp.RequestHandler):
-  def get(self):
-    query = Game.all()
-    games = [i for i in query.fetch(1000)]
-
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(
-      'templates/index.html', {'games': games}))
-
-
-class PlayPage(BasePage):
+class PlayPage(LoginPage):
   def post(self, gameurl):
     if not self.setup(gameurl):
       return
@@ -566,7 +557,7 @@ class PlayPage(BasePage):
 
   get = post
 
-class AbandonPage(BasePage):
+class AbandonPage(LoginPage):
   def get(self, gameurl):
     if not self.setup(gameurl):
       return
@@ -603,7 +594,6 @@ application = webapp.WSGIApplication(
    ('/game/edit',            GameEditPage),
    ('/game/delete',          GameDeletePage),
    ('/(.*)/edit',            GameEditRedirect),
-   ('/populate',             PopulatePage),
    ],
   debug=True)
 

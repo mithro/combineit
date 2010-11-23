@@ -1,7 +1,7 @@
-<html>
-  <body>
-    <a href="/{{ game.url }}/elements/list">&lt; Back</a>
-    <form method="POST" action="/{{ game.url }}/elements/edit">
+{% extends "base.html" %}
+{% block body %}
+    <a href="/{{ game.url }}/elements/list#">&lt; Back</a>
+    <form method="POST" action="/{{ game.url }}/elements/edit#">
       <input name="key" type="hidden" value="{{ object|key }}">
       <table>
         <tr>
@@ -30,9 +30,9 @@
           <td colspan="2"><img id="category-preview" src="{{ object.category.icon }}" height="256" width="256"></td>
         </tr><tr>
           <td><input type="submit" value="Save"></td>
-          <td><a href="/{{ game.url }}/categories/delete?key={{category|key}}">Delete</a></td>
+          <td><a href="/{{ game.url }}/categories/delete?key={{category|key}}#">Delete</a></td>
         </tr>
       </table>
     </form>
   </body>
-</html>
+{% endblock %}

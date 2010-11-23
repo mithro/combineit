@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+    {% if game %}
+    <title>{{ game.name }} on Combined It!</title>
+    {% else %}
+    <title>Combined It!</title>
+    {% endif %}
+
+    <link rel="StyleSheet" href="/css/base.css" type="text/css" media="screen">
+  </head>
+  <body>
+    <!-- Top header -->
+    <div id="header" class="chrome">
+      <ul class="left">
+        <li {% ifequal path '/' %}class='current'{%endifequal%}><a href="/#">Home</a></li>
+        <li>Featured Games <span class=small>&#9660;</span>
+          <ul>
+            {% for g in featured_games %}
+            <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
+            {% endfor %}
+          </ul></li>
+        <li>Popular Games <span class=small>&#9660;</span>
+          <ul>
+            {% for g in popular_games %}
+            <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
+            {% endfor %}
+          </ul></li>
+        <li>Currently Playing <span class=small>&#9660;</span>
+          <ul>
+            {% for g in current_games %}
+            <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
+            {% endfor %}
+          </ul></li>
+        </ul>
+
+
+      <ul class="right">
+        {% if user %}
+        <li>{{ user.email }}</a></li>
+        <li><a href="/settings#">Settings</a></li>
+        <li><a href="{{ logout_url }}">Logout</a></li>
+        {% else %}
+        <li><a href="{{ login_url }}">Login</a></li>
+        {% endif %}
+      </ul>
+
+      <ul class="middle">
+        <li class="title">{{ title }} {{ game.name }}</li>
+      </ul>
+
+    </div>
+
+    <!-- Body -->
+    <div id=body>
+{% block body %}{% endblock %}
+    </div>
+
+    <!-- Footer - Admin functions -->
+    <div id=footer class=chrome>
+      {% if is_current_user_admin %}
+      <ul class=left>
+        {% if game %}
+        <li><a href="/game/edit?key={{ game|key }}#">Edit Game</a></li>
+        {% endif %}
+        {% block admin %}
+        {% endblock %}
+      </ul>
+      {% endif %}
+
+      <ul class=right>
+        {% if game %}
+        <li>{{ game.name }} created by {{ game.created_by.nickname }} </li>
+        {% endif %}
+        <li>Combined It! created by Tim 'mithro' Ansell</li>
+        <li>&#x1f41b; Report bug</li>
+      </ul>
+    </div>
+
+  </body>
+</html>

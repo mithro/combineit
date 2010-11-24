@@ -133,13 +133,11 @@ class BasePage(webapp.RequestHandler):
 
     return mark_safe(html), scratch
 
-  def RenderUserBench(self, prefix, thisform, submitform=None, default_elements=[]):
+  def RenderUserBench(self, prefix, thisform, submitform=None):
     # FIXME: This doesn't belong on this class
 
     # Get all the elements in the current "scratch area"
     keys = [x for x in self.request.get_all('%s_scratch' % prefix) if x]
-    if not keys:
-      keys = default_elements
 
     logging.info('key starting %r', keys)
     try:

@@ -1,47 +1,96 @@
 {% extends "base.html" %}
 {% block body %}
 
-  <h1>Combination found!</h1>
-  <p>
-    {% for element in combination.input %}
-      {{ element.name }}
-    {% endfor %}
-<pre>
-  ||
-  \/
-</pre>
-    {% for element in combination.output %}
-      {{ element.name }}
-    {% endfor %}
-  </p>
+  <style>
+td div {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+img.down {
+  width: 64px;
+  height: 64px;
+}
+
+  </style>
+  <div style="text-align: center;" onClick="window.location.href='/{{ game.url }}/play';">
+
 
   {% if combination.name %}
-  <h2>{{combination.name}}</h2>
+  <h1>{{combination.name}} found!</h1>
+  {% else %}
+  <h1>Combination found!</h1>
   {% endif %}
   {% if combination.description %}
   <p>{{combination.description}}</p>
   {% endif %}
 
+  <hr>
+
+  <table>
+    <tr>
+    {% for element in combination.input %}
+      <td>
+      {{ element|icon }}
+      </td>
+    {% endfor %}
+    </tr>
+  </table>
+
+  <img class="down" src="/images/down.png" alt="converts to">
+
+  <table>
+    <tr>
+    {% for element in combination.output %}
+      <td>
+      {{ element|icon }}
+      </td>
+    {% endfor %}
+    </tr>
+  </table>
+
+  <hr>
+
+  <table>
+    <tr>
+        <td>
+    
   {% if new_elements %}
   <h1>New Elements found</h1>
-  <p>
+  <table>
+    <tr>
     {% for element in new_elements %}
-      <h2>{{ element.name }}</h2>
+      <td>
+      {{ element|icon }}
+      </td>
     {% endfor %}
-  </p>
+    </tr>
+  </table>
   {% else %}
   <h1>No new elements found.</h1>
   {% endif %}
 
+      </td>
+      <td>
+
   {% if new_categories %}
   <h1>New Categories found</h1>
-  <p>
+  <table>
+    <tr>
     {% for category in new_categories %}
-      <h2>{{ category.name }}</h2>
+      <td>
+      {{ category|icon }}
+      </td>
     {% endfor %}
-  </p>
+    </tr>
+  </table>
   {% else %}
   <h1>No new categories found.</h1>
   {% endif %}
 
+      </td>
+    </tr>
+  </table>
+
+   </div>
 {% endblock %}

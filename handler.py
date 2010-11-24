@@ -80,26 +80,12 @@ class BasePage(webapp.RequestHandler):
     # FIXME: This doesn't belong on this class
 
     # Get all the elements in the current "scratch area"
-    keys = self.request.get_all('%s_scratch' % prefix)
-    if not keys:
-      keys = default_elements
-
-    logging.info('key starting %r', keys)
-    try:
-      toremove = int(self.request.get('%s_remove' % prefix))
-      logging.info('key toremove %r', toremove)
-      del keys[toremove]
-    except ValueError:
-      pass
-
-    toadd = self.request.get('%s_add' % prefix)
-    if toadd:
-      logging.info('key toadd %r', toadd)
-      keys.append(toadd)
-
+    keys = self.ScratchAreaKeys(prefix, default_elements)
     logging.info('keys final %r', keys)
-
-    scratch = Element.get(keys)
+    if keys:
+      scratch = Element.get(keys)
+    else:
+      scratch = []
 
     # Work out which category is currently display on the bench.
     query = Category.all()
@@ -133,10 +119,7 @@ class BasePage(webapp.RequestHandler):
 
     return mark_safe(html), scratch
 
-  def RenderUserBench(self, prefix, thisform, submitform=None):
-    # FIXME: This doesn't belong on this class
-
-    # Get all the elements in the current "scratch area"
+  def ScratchAreaKeys(self, prefix, default):
     keys = [x for x in self.request.get_all('%s_scratch' % prefix) if x]
 
     logging.info('key starting %r', keys)
@@ -153,11 +136,16 @@ class BasePage(webapp.RequestHandler):
       keys.append(toadd)
 
     logging.info('keys final %r', keys)
+    
+  def RenderUserBench(self, prefix, thisform, submitform=None):
+    # FIXME: This doesn't belong on this class
 
+    # Get all the elements in the current "scratch area"
+    keys = self.ScratchAreaKeys(prefix, [])
     if keys:
-	scratch = UsersElement.get(keys)
+      scratch = UsersElement.get(keys)
     else:
-        scratch = []
+      scratch = []
 
     # Work out which category is currently display on the bench.
     query = UsersCategory.all()

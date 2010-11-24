@@ -1,13 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
-  <h1>{{game.name}} created by {{game.owner.nickname}}</h1>
 
-  {% if results %}
-  {% for element in results %}
-    <h2>{{ element.name }}</h2>
+  {% for object in results %}
+    <h2>{{ object|icon }}</h2>
   {% endfor %}
-  {% else %}
-    No elements have been found yet!
-  {% endif %}
 
 {% endblock %}

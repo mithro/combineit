@@ -76,51 +76,10 @@ class BasePage(webapp.RequestHandler):
       self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
       self.response.out.write(template.render(tmpl, result))
 
-  def RenderAdminBench(self, prefix, thisform, submitform=None, default_elements=[]):
-    # FIXME: This doesn't belong on this class
-
-    # Get all the elements in the current "scratch area"
-    keys = self.ScratchAreaKeys(prefix, default_elements)
-    logging.info('keys final %r', keys)
-    if keys:
-      scratch = Element.get(keys)
-    else:
-      scratch = []
-
-    # Work out which category is currently display on the bench.
-    query = Category.all()
-    query.filter('game =', self.game)
-    categories = query.fetch(1000)
-
-    selected_category_key = self.request.get(prefix+'_category')
-    try:
-      selected_category = Category.get(selected_category_key)
-    except db.BadKeyError, e:
-      selected_category = categories[0]
-
-    query = Element.all()
-    query.filter('game =', self.game)
-    query.filter('category =', selected_category)
-    elements = query.fetch(1000)
-
-    if not submitform:
-      submitform = thisform
-
-    # Render out the bench
-    html = template.render(
-        'templates/bench.html',
-        {'submitform': submitform,
-         'thisform': thisform,
-         'scratch': scratch,
-         'categories': categories,
-         'elements': elements,
-         'selected_category': selected_category,
-         'prefix': prefix})
-
-    return mark_safe(html), scratch
-
-  def ScratchAreaKeys(self, prefix, default):
+  def RenderBenchKeys(self, prefix, default=None):
     keys = [x for x in self.request.get_all('%s_scratch' % prefix) if x]
+    if not keys and default:
+      keys = default[:]
 
     logging.info('key starting %r', keys)
     try:
@@ -137,61 +96,6 @@ class BasePage(webapp.RequestHandler):
 
     logging.info('keys final %r', keys)
     
-  def RenderUserBench(self, prefix, thisform, submitform=None):
-    # FIXME: This doesn't belong on this class
-
-    # Get all the elements in the current "scratch area"
-    keys = self.ScratchAreaKeys(prefix, [])
-    if keys:
-      scratch = UsersElement.get(keys)
-    else:
-      scratch = []
-
-    # Work out which category is currently display on the bench.
-    query = UsersCategory.all()
-    query.filter('game =', self.game)
-    query.filter('user =', self.user)
-    categories = query.fetch(1000)
-
-    # Populate the database
-    if not categories:
-      for category_key in self.game.starting_categories:
-        category = Category.get(category_key)
-
-        categories.append(
-            UsersCategory.Create(self.user, self.game, category))
-
-      for element_key in self.game.starting_elements:
-        element = Element.get(element_key)
-        UsersElement.Create(self.user, self.game, element)
-
-    selected_category_key = self.request.get(prefix+'_category')
-    try:
-      selected_category = UsersCategory.get(selected_category_key)
-    except db.BadKeyError, e:
-      selected_category = categories[0]
-
-    query = UsersElement.all()
-    query.filter('game =', self.game)
-    query.filter('user =', self.user)
-    query.filter('category =', selected_category.reference)
-    elements = query.fetch(1000)
-
-    if not submitform:
-      submitform = thisform
-
-    # Render out the bench
-    html = template.render(
-        'templates/bench.html',
-        {'submitform': submitform,
-         'thisform': thisform,
-         'scratch': scratch,
-         'categories': categories,
-         'elements': elements,
-         'selected_category': selected_category,
-         'prefix': prefix})
-
-    return mark_safe(html), scratch
 
 
 class LoginPage(BasePage):
@@ -361,6 +265,44 @@ class ComboEditPage(EditPage):
   klass = Combination
   fields = ("name", "description")
 
+  def RenderAdminBench(self, prefix, thisform, defaultkeys=None):
+    # Get all the elements in the current "scratch area"
+    keys = self.RenderBenchKeys(prefix, defaultkeys)
+    logging.info('keys final %r', keys)
+    if keys:
+      scratch = Element.get(keys)
+    else:
+      scratch = []
+
+    # Work out which category is currently display on the bench.
+    query = Category.all()
+    query.filter('game =', self.game)
+    categories = query.fetch(1000)
+
+    selected_category_key = self.request.get(prefix+'_category')
+    try:
+      selected_category = Category.get(selected_category_key)
+    except db.BadKeyError, e:
+      selected_category = categories[0]
+
+    query = Element.all()
+    query.filter('game =', self.game)
+    query.filter('category =', selected_category)
+    elements = query.fetch(1000)
+
+    # Render out the bench
+    html = template.render(
+        'templates/bench.html',
+        {'submitform': thisform,
+         'thisform': thisform,
+         'scratch': scratch,
+         'categories': categories,
+         'elements': elements,
+         'selected_category': selected_category,
+         'prefix': prefix})
+
+    return mark_safe(html), scratch
+
   def post(self, gameurl):
     combo = self.common(gameurl)
     if not combo:
@@ -374,12 +316,12 @@ class ComboEditPage(EditPage):
 
   def render(self, combo):
     input_html, input_elements = self.RenderAdminBench(
-        'input', thisform='edit', default_elements=combo.inputkeys)
+        'input', thisform='edit', defaultkeys=combo.inputkeys)
     if input_elements:
       combo.inputkeys = [str(x.key()) for x in input_elements]
 
     output_html, output_elements = self.RenderAdminBench(
-        'output', thisform='edit', default_elements=combo.outputkeys)
+        'output', thisform='edit', defaultkeys=combo.outputkeys)
     if output_elements:
       combo.outputkeys = [str(x.key()) for x in output_elements]
 
@@ -582,6 +524,63 @@ class CombinePage(LoginPage):
 
 
 class PlayPage(LoginPage):
+
+  def RenderUserBench(self, prefix, thisform, submitform=None):
+    # FIXME: This doesn't belong on this class
+
+    # Get all the elements in the current "scratch area"
+    keys = self.RenderBenchKeys(prefix, [])
+    if keys:
+      scratch = UsersElement.get(keys)
+    else:
+      scratch = []
+
+    # Work out which category is currently display on the bench.
+    query = UsersCategory.all()
+    query.filter('game =', self.game)
+    query.filter('user =', self.user)
+    categories = query.fetch(1000)
+
+    # Populate the database
+    if not categories:
+      for category_key in self.game.starting_categories:
+        category = Category.get(category_key)
+
+        categories.append(
+            UsersCategory.Create(self.user, self.game, category))
+
+      for element_key in self.game.starting_elements:
+        element = Element.get(element_key)
+        UsersElement.Create(self.user, self.game, element)
+
+    selected_category_key = self.request.get(prefix+'_category')
+    try:
+      selected_category = UsersCategory.get(selected_category_key)
+    except db.BadKeyError, e:
+      selected_category = categories[0]
+
+    query = UsersElement.all()
+    query.filter('game =', self.game)
+    query.filter('user =', self.user)
+    query.filter('category =', selected_category.reference)
+    elements = query.fetch(1000)
+
+    if not submitform:
+      submitform = thisform
+
+    # Render out the bench
+    html = template.render(
+        'templates/bench.html',
+        {'submitform': submitform,
+         'thisform': thisform,
+         'scratch': scratch,
+         'categories': categories,
+         'elements': elements,
+         'selected_category': selected_category,
+         'prefix': prefix})
+
+    return mark_safe(html), scratch
+
   def post(self, gameurl):
     if not self.setup(gameurl):
       return

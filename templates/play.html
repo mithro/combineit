@@ -2,97 +2,19 @@
 {% block body %}
     <a href="/{{ game.url }}/abandon#">Restart Game</a>
 
-<script language="JavaScript" type="text/javascript">
-<!--
-function changeCategory( key )
-{
-  document.forms['scratch'].selected_category.value = key;
-  document.forms['scratch'].submit() ;
-}
-
-function addElement( key )
-{
-  document.forms['scratch'].toadd.value = key;
-  document.forms['scratch'].submit() ;
-}
-
-function removeElement( key )
-{
-  document.forms['scratch'].toremove.value = key;
-  document.forms['scratch'].submit() ;
-}
--->
-</script>
-
-<form id="scratch" action="/{{ game.url }}/play#" method="post">
-    <input type="hidden" name="selected_category" value="{{ selected_category|key }}">
-    <input type="hidden" name="toadd" value="">
-    <input type="hidden" name="toremove" value="">
-    <table class="bench">
-      <tr>
-        {% for userelement in tocombined %}
-        <td colspan=2>
-          <div>
-            <input type="hidden" name="tocombined" value="{{ userelement|key }}">
-            <a href="#" onClick="removeElement( '{{ forloop.counter0 }}')">
-              {{ userelement|icon }}
-            </a>
-          </div>
-        </td>
-        {% endfor %}
-        <td class="category bench">
-          <div class="button">
-            <a href="#" onClick="document.forms.bench.submit()">
-              Submit
-            </a>
-          </div>
-        </td>
-      </tr>
-     </table>
-
-     <table>
-      {% for usercategory in categories %}
-      <tr>
-
-        {% ifequal usercategory.reference|key selected_category|key %}
-        <td class="category selected">
-        {% else %}
-        <td class="category notselected">
-        {% endifequal %}
-
-	  <a href="#" onClick="changeCategory('{{ usercategory.reference|key }}')">
-	    {{ usercategory|icon }}
-          </a>
-        </td>
-
-        {% ifequal forloop.counter0 0 %}
-        <td class="element" rowspan="{{ categories|length }}">
-          {% for userelement in elements %}
-          <div>
-            <a href="#" onClick="addElement('{{ userelement|key }}')">
-	      {{ userelement|icon }}
-            </a>
-          </div>
-          {% endfor %}
-        </td>
-        {% endifequal %}
-      </tr>
-      {% endfor %}
-    </table>
+  <form id="scratch" action="/{{ game.url }}/play#" method="post">
+    {{ scratch_bench }}
   </form>
 
   <form id="bench" action="/{{ game.url }}/combine" method="post">
-    <input type="submit" name="action" value="Combine">
-    {% for userelement in tocombined %}
+    {% for userelement in scratch %}
       <input type="hidden" name="tocombined" value="{{ userelement.reference|key }}">
     {% endfor %}
   </form>
 
 
   <form id="quickcreate" action="/{{ game.url }}/combo/edit" method="post">
-    <input type="hidden" name="selected_category"
-           value="{{ selected_category|key }}">
-    {% for userelement in tocombined %}
+    {% for userelement in scratch %}
       <input type="hidden" name="inputkeys" value="{{ userelement.reference|key }}">
     {% endfor %}
   </form>

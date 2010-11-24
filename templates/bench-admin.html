@@ -1,0 +1,78 @@
+<script language="JavaScript" type="text/javascript">
+<!--
+function {{prefix}}_change_category( key )
+{
+  document.forms['{{thisform}}'].{{prefix}}_category.value = key;
+  document.forms['{{thisform}}'].submit() ;
+}
+
+function {{prefix}}_add_element( key )
+{
+  document.forms['{{thisform}}'].{{prefix}}_add.value = key;
+  document.forms['{{thisform}}'].submit() ;
+}
+
+function {{prefix}}_remove_element( key )
+{
+  document.forms['{{thisform}}'].{{prefix}}_remove.value = key;
+  document.forms['{{thisform}}'].submit();
+}
+-->
+</script>
+
+    <input type="hidden" name="{{ prefix }}_category" value="{{ selected_category|key }}">
+    <input type="hidden" name="{{ prefix }}_add" value="">
+    <input type="hidden" name="{{ prefix }}_remove" value="">
+
+    <table class="scratch">
+      <tr>
+        {% for element in scratch %}
+        <td colspan=2>
+          <div>
+            <input type="hidden" name="{{ prefix }}_scratch" value="{{ element|key }}">
+            <a href="#" onClick="{{prefix}}_remove_element( '{{ forloop.counter0 }}')">
+              {{ element|icon }}
+            </a>
+          </div>
+        </td>
+        {% endfor %}
+        <td class="category bench">
+          <div class="button">
+            <a href="#" onClick="document.forms['{{ submitform }}'].submit()">
+              Submit
+            </a>
+          </div>
+        </td>
+      </tr>
+     </table>
+
+     <table>
+      {% for category in categories %}
+      <tr>
+
+        {% ifequal category|key selected_category|key %}
+        <td class="category selected">
+        {% else %}
+        <td class="category notselected">
+        {% endifequal %}
+
+        <a href="#" onClick="{{prefix}}_change_category('{{ category|key }}')">
+            {{ category|icon }}
+          </a>
+        </td>
+
+        {% ifequal forloop.counter0 0 %}
+        <td class="element" rowspan="{{ categories|length }}">
+          {% for element in elements %}
+          <div>
+            <a href="#" onClick="{{prefix}}_add_element('{{ element|key }}')">
+              {{ element|icon }}
+            </a>
+          </div>
+          {% endfor %}
+        </td>
+        {% endifequal %}
+      </tr>
+      {% endfor %}
+    </table>
+  </form>

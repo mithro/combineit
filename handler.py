@@ -20,9 +20,10 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
-import json
-
+from django.utils.safestring import mark_safe
 import django_extra
+
+import json
 
 from models.base import *
 from models.peruser import *
@@ -75,6 +76,63 @@ class BasePage(webapp.RequestHandler):
       self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
       self.response.out.write(template.render(tmpl, result))
 
+  def RenderBench(self, prefix, thisform, submitform=None, default_elements=[]):
+    # FIXME: This doesn't belong on this class
+
+    # Get all the elements in the current "scratch area"
+    keys = self.request.get_all('%s_scratch' % prefix)
+    if not keys:
+      keys = default_elements
+
+    logging.info('key starting %r', keys)
+    try:
+      toremove = int(self.request.get('%s_remove' % prefix))
+      logging.info('key toremove %r', toremove)
+      del keys[toremove]
+    except ValueError:
+      pass
+
+    toadd = self.request.get('%s_add' % prefix)
+    if toadd:
+      logging.info('key toadd %r', toadd)
+      keys.append(toadd)
+
+    logging.info('keys final %r', keys)
+
+    scratch = Element.get(keys)
+
+    # Work out which category is currently display on the bench.
+    query = Category.all()
+    query.filter('game =', self.game)
+    categories = query.fetch(1000)
+
+    selected_category_key = self.request.get(prefix+'_category')
+    try:
+      selected_category = Category.get(selected_category_key)
+    except db.BadKeyError, e:
+      selected_category = categories[0]
+
+    query = Element.all()
+    query.filter('game =', self.game)
+    query.filter('category =', selected_category)
+    elements = query.fetch(1000)
+
+    if not submitform:
+      submitform = thisform
+
+    # Render out the bench
+    html = template.render(
+        'templates/bench-admin.html',
+        {'submitform': submitform,
+         'thisform': thisform,
+         'scratch': scratch,
+         'categories': categories,
+         'elements': elements,
+         'selected_category': selected_category,
+         'prefix': prefix})
+
+    return mark_safe(html), scratch
+
 
 class LoginPage(BasePage):
   def setup(self, gameurl):
@@ -126,7 +184,7 @@ class CategoryDeletePage(DeletePage):
 
 
 class ComboDeletePage(DeletePage):
-  url = "combo"
+  url = "combos"
   klass = Combination
 
 
@@ -164,7 +222,7 @@ class CategoryListPage(EditListPage):
 
 
 class ComboListPage(EditListPage):
-  url = "combo"
+  url = "combos"
   klass = Combination
 
 
@@ -236,72 +294,39 @@ class CategoryEditPage(EditPage):
                     {'object': category})
 
 
+
+
 class ComboEditPage(EditPage):
   url = "combo"
   klass = Combination
   fields = ("name", "description")
-
-  def elements(self, name):
-    keys = self.request.get_all('%skeys' % name)
-
-    try:
-      toremove = int(self.request.get('%sremove' % name))
-      del keys[toremove]
-    except ValueError:
-      pass
-
-    toadd = self.request.get('%sadd' % name)
-    if toadd:
-      keys.append(toadd)
-
-    logging.info('%s %r', name, keys)
-
-    return Element.get(keys)
 
   def post(self, gameurl):
     combo = self.common(gameurl)
     if not combo:
       return
 
-    inputkeys = self.elements('input')
-    if inputkeys:
-      combo.inputkeys = [str(x.key()) for x in inputkeys]
-
-    outputkeys = self.elements('output')
-    if outputkeys:
-      combo.outputkeys = [str(x.key()) for x in outputkeys]
+    self.render(combo)
 
     # Quick Create doesn't set this..
     if self.request.get('action') == 'Save':
       combo.put()
 
-    self.render(combo)
-
   def render(self, combo):
-    query = Category.all()
-    query.filter('game =', self.game)
-    categories = query.fetch(1000)
+    input_html, input_elements = self.RenderBench(
+        'input', thisform='edit', default_elements=combo.inputkeys)
+    if input_elements:
+      combo.inputkeys = [str(x.key()) for x in input_elements]
 
-    selected_category = self.request.get('selected_category')
-    logging.info('selected_category %s', selected_category)
-    if selected_category.strip():
-      selected_category = Category.get(selected_category)
-    else:
-      selected_category = categories[0]
-
-    query = Element.all()
-    query.filter('game =', self.game)
-    query.filter('category =', selected_category)
-    elements = query.fetch(1000)
-
-    logging.info('input %r', combo.input())
-    logging.info('output %r', combo.output())
+    output_html, output_elements = self.RenderBench(
+        'output', thisform='edit', default_elements=combo.outputkeys)
+    if output_elements:
+      combo.outputkeys = [str(x.key()) for x in output_elements]
 
     EditPage.render(self, 'templates/edit-combo.html',
                     {'object': combo,
-                     'elements': elements,
-                     'categories': categories,
-                     'selected_category': selected_category})
+                     'input_bench': input_html,
+                     'output_bench': output_html})
 
 ###############################################################################
 ###############################################################################
@@ -501,58 +526,10 @@ class PlayPage(LoginPage):
     if not self.setup(gameurl):
       return
 
-    tocombined = self.request.get_all('tocombined')
-
-    # We use an index for removal rather then keys like verything else so that
-    # if multiple items are in the list we remove the right one.
-    try:
-      toremove = int(self.request.get('toremove'))
-      del tocombined[toremove]
-    except ValueError:
-      pass
-
-    # Add any new item.
-    toadd = self.request.get('toadd')
-    if toadd:
-      tocombined.append(toadd)
-
-    tocombined = UsersElement.get(tocombined)
-
-    categories_query = UsersCategory.all()
-    categories_query.filter('game =', self.game)
-    categories_query.filter('user =', self.user)
-    categories = categories_query.fetch(1000)
-
-    # Populate the database
-    if not categories:
-      for category_key in self.game.starting_categories:
-        category = Category.get(category_key)
-
-        categories.append(
-            UsersCategory.Create(self.user, self.game, category))
-
-      for element_key in self.game.starting_elements:
-        element = Element.get(element_key)
-        UsersElement.Create(self.user, self.game, element)
-
-    selected_category_id = self.request.get('selected_category')
-    if selected_category_id:
-      selected_category = Category.get(selected_category_id)
-      assert selected_category is not None
-    else:
-      selected_category = categories[0].reference
-
-    elements_query = UsersElement.all()
-    elements_query.filter('game =', self.game)
-    elements_query.filter('user =', self.user)
-    elements_query.filter('category =', selected_category)
-    elements = elements_query.fetch(1000)
-
+    scratch_html, elements = self.RenderBench('scratch', thisform='scratch', submitform='bench')
     return self.render('templates/play.html', {
-        'tocombined': tocombined,
-        'elements': elements,
-        'selected_category': selected_category,
-        'categories': categories,
+        'scratch': elements,
+        'scratch_bench': scratch_html,
         })
 
   get = post
@@ -585,9 +562,9 @@ application = webapp.WSGIApplication(
    ('/(.*)/categories/list', CategoryListPage),
    ('/(.*)/categories/edit', CategoryEditPage),
    ('/(.*)/categories/delete', CategoryDeletePage),
-   ('/(.*)/combo/list',      ComboListPage),
-   ('/(.*)/combo/edit',      ComboEditPage),
-   ('/(.*)/combo/delete',    ComboDeletePage),
+   ('/(.*)/combos/list',     ComboListPage),
+   ('/(.*)/combos/edit',     ComboEditPage),
+   ('/(.*)/combos/delete',   ComboDeletePage),
    ('/(.*)/combine',         CombinePage),
    ('/(.*)/play',            PlayPage),
    ('/(.*)/abandon',         AbandonPage),

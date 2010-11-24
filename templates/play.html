@@ -13,9 +13,9 @@
   </form>
 
 
-  <form id="quickcreate" action="/{{ game.url }}/combo/edit" method="post">
+  <form id="quickcreate" action="/{{ game.url }}/combos/edit" method="post">
     {% for userelement in scratch %}
-      <input type="hidden" name="inputkeys" value="{{ userelement.reference|key }}">
+      <input type="hidden" name="input_scratch" value="{{ userelement.reference|key }}">
     {% endfor %}
   </form>
 

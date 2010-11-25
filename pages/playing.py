@@ -174,24 +174,35 @@ class CombinePage(common.LoginPage):
       self.render('templates/nocombine.html', {'code': 302, 'error': 'Almost!'})
       return
 
-    peruser.UsersCombination.Create(self.user, self.game, combination)
+    new_usercombination = peruser.UsersCombination.Create(
+        self.user, self.game, combination)
+    if not new_usercombination:
+      query = peruser.UsersCombination.all()
+      query.filter('game =', self.game)
+      query.filter('user =', self.user)
+      query.filter('reference =', combination)
+      usercombination = query.get()
+    else:
+      usercombination = new_usercombination
+      new_usercombination = True
 
     categories = set()
-    new_elements = set()
+    new_userelements = set()
     for element in combination.output():
       categories.add(element.category)
 
       if peruser.UsersElement.Create(self.user, self.game, element):
-        new_elements.add(element)
+        new_userelements.add(element)
 
-    new_categories = set()
+    new_usercategories = set()
     for category in categories:
       if peruser.UsersCategory.Create(self.user, self.game, category):
-        new_categories.add(category)
+        new_usercategories.add(category)
 
     return self.render(
         'templates/combine.html',
         {'code': 200,
-         'combination': combination,
-         'new_elements': new_elements,
-         'new_categories': new_categories})
+         'new_usercombination': new_usercombination,
+         'usercombination': usercombination,
+         'new_userelements': new_userelements,
+         'new_usercategories': new_usercategories})

@@ -16,20 +16,25 @@ img.down {
   <div style="text-align: center;" onClick="window.location.href='/{{ game.url }}/play';">
 
 
-  {% if combination.name %}
-  <h1>{{combination.name}} found!</h1>
-  {% else %}
-  <h1>Combination found!</h1>
+  <h1>
+  {% if new_usercombination %}
+  <b>New</b>
   {% endif %}
-  {% if combination.description %}
-  <p>{{combination.description}}</p>
+  {% if usercombination.reference.name %}
+  {{usercombination.reference.name}} found!
+  {% else %}
+  Combination found!
+  {% endif %}
+  </h1>
+  {% if usercombination.reference.description %}
+  <p>{{usercombination.reference.description}}</p>
   {% endif %}
 
   <hr>
 
   <table>
     <tr>
-    {% for element in combination.input %}
+    {% for element in usercombination.reference.input %}
       <td>
       {{ element|icon }}
       </td>
@@ -41,7 +46,7 @@ img.down {
 
   <table>
     <tr>
-    {% for element in combination.output %}
+    {% for element in usercombination.reference.output %}
       <td>
       {{ element|icon }}
       </td>
@@ -54,14 +59,14 @@ img.down {
   <table>
     <tr>
         <td>
-    
-  {% if new_elements %}
+
+  {% if new_userelements %}
   <h1>New Elements found</h1>
   <table>
     <tr>
-    {% for element in new_elements %}
+    {% for userelement in new_userelements %}
       <td>
-      {{ element|icon }}
+      {{ userelement|icon }}
       </td>
     {% endfor %}
     </tr>
@@ -73,13 +78,13 @@ img.down {
       </td>
       <td>
 
-  {% if new_categories %}
+  {% if new_usercategories %}
   <h1>New Categories found</h1>
   <table>
     <tr>
-    {% for category in new_categories %}
+    {% for usercategory in new_usercategories %}
       <td>
-      {{ category|icon }}
+      {{ usercategory|icon }}
       </td>
     {% endfor %}
     </tr>

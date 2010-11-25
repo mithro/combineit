@@ -36,8 +36,10 @@ function {{prefix}}_remove_element( key )
           </div>
         </td>
         {% endfor %}
+
         <td class="category bench">
           <div class="button">
+            <input type="hidden" name="{{ prefix }}_scratch" value="">
             <a href="#" onClick="document.forms['{{ submitform }}'].submit()">
               Submit
             </a>

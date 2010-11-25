@@ -65,9 +65,11 @@ class BasePage(webapp.RequestHandler):
       self.response.out.write(template.render(tmpl, result))
 
   def RenderBenchKeys(self, prefix, default=None):
-    keys = [x for x in self.request.get_all('%s_scratch' % prefix) if x]
+    keys = self.request.get_all('%s_scratch' % prefix)
     if not keys and default:
       keys = default[:]
+
+    keys = [x for x in keys if x]
 
     logging.info('key starting %r', keys)
     try:

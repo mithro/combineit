@@ -8,7 +8,7 @@
 
   <form id="bench" action="/{{ game.url }}/combine" method="post">
     {% for userelement in scratch %}
-      <input type="hidden" name="tocombined" value="{{ userelement.reference|key }}">
+      <input type="hidden" name="tocombined" value="{{ userelement|key }}">
     {% endfor %}
   </form>
 

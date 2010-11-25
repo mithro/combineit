@@ -139,15 +139,19 @@ class CombinePage(common.LoginPage):
     if not self.setup(gameurl):
       return
 
-    input = self.request.get_all('tocombined')
-    input = list(sorted(input))
-    logging.debug('input %s', input)
-    if not input:
+    userselementids = self.request.get_all('tocombined')
+    userselementids = list(sorted(userselementids))
+    logging.debug('userselementids %s', userselementids)
+    if not userselementids:
       self.render('templates/nocombine.html', {'code': 404, 'error': 'No input!'})
       return
 
+    userselements = peruser.UsersElement.get(userselementids)
+
+    elements = [str(x.reference.key()) for x in userselements]
+
     query = base.Combination.all()
-    for element in input:
+    for element in elements:
       query.filter('inputkeys =', element)
 
     results = query.fetch(1000)
@@ -164,7 +168,7 @@ class CombinePage(common.LoginPage):
         tomatch.append(elementid)
       tomatch = list(sorted(tomatch))
 
-      if input == tomatch:
+      if elements == tomatch:
         break
     else:
       self.render('templates/nocombine.html', {'code': 302, 'error': 'Almost!'})

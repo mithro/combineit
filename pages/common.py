@@ -4,6 +4,7 @@
 import json
 import logging
 import pprint
+import re
 import urlparse
 
 from google.appengine.api import users
@@ -38,8 +39,18 @@ class BasePage(webapp.RequestHandler):
     output = self.request.get('output')
 
     if output == 'json':
-      self.response.headers['Content-Type'] = 'application/json'
+      callback = re.sub('[^A-Za-z]', '', self.request.get('callback')).strip()
+
+      if not callback:
+        self.response.headers['Content-Type'] = 'application/json'
+      else:
+        self.response.headers['Content-Type'] = 'application/x-javascript'
+        self.response.out.write('%s(' % callback)
+
       self.response.out.write(json.JSONEncoder().encode(result))
+
+      if callback:
+        self.response.out.write(');')
 
     elif output == 'text':
       self.response.headers['Content-Type'] = 'text/plain'

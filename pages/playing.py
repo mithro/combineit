@@ -57,6 +57,18 @@ class AbandonPage(common.LoginPage):
     self.redirect('/')
 
 
+class PlayJSPage(common.LoginPage):
+  """A Page which is javascript based."""
+
+  def post(self, gameurl):
+    if not self.setup(gameurl):
+      return
+
+    return self.render('templates/playjs.html', {})
+
+  get = post
+
+
 class PlayPage(common.LoginPage):
   """Page which actually lets you play the game."""
 
@@ -139,14 +151,21 @@ class CombinePage(common.LoginPage):
     if not self.setup(gameurl):
       return
 
-    userselementids = self.request.get_all('tocombined')
+    userselementids = self.request.get_all('tocombined[]')
     userselementids = list(sorted(userselementids))
-    logging.debug('userselementids %s', userselementids)
+    logging.info('userselementids %s', userselementids)
     if not userselementids:
-      self.render('templates/nocombine.html', {'code': 404, 'error': 'No input!'})
+      self.render('templates/nocombine.html', {
+          'code': 404, 'error': 'No input!'})
       return
 
     userselements = peruser.UsersElement.get(userselementids)
+    logging.info(userselements)
+    logging.info([x for x in userselements if x])
+    if len([x for x in userselements if x]) != len(userselements):
+      self.render('templates/nocombine.html', {
+          'code': 404, 'error': 'Unknown element!'})
+      return
 
     elements = [str(x.reference.key()) for x in userselements]
 
@@ -158,7 +177,8 @@ class CombinePage(common.LoginPage):
     logging.debug('results %s', results)
 
     if not results:
-      self.render('templates/nocombine.html', {'code': 404, 'error': 'No dice!'})
+      self.render('templates/nocombine.html', {
+          'code': 404, 'error': 'No dice!'})
       return
 
     for combination in results:
@@ -171,7 +191,8 @@ class CombinePage(common.LoginPage):
       if elements == tomatch:
         break
     else:
-      self.render('templates/nocombine.html', {'code': 302, 'error': 'Almost!'})
+      self.render('templates/nocombine.html', {
+          'code': 302, 'error': 'Almost!'})
       return
 
     new_usercombination = peruser.UsersCombination.Create(
@@ -191,13 +212,15 @@ class CombinePage(common.LoginPage):
     for element in combination.output():
       categories.add(element.category)
 
-      if peruser.UsersElement.Create(self.user, self.game, element):
-        new_userelements.add(element)
+      userelement = peruser.UsersElement.Create(self.user, self.game, element)
+      if userelement:
+        new_userelements.add(userelement)
 
     new_usercategories = set()
     for category in categories:
-      if peruser.UsersCategory.Create(self.user, self.game, category):
-        new_usercategories.add(category)
+      usercategory = peruser.UsersCategory.Create(self.user, self.game, category)
+      if usercategory:
+        new_usercategories.add(usercategory)
 
     return self.render(
         'templates/combine.html',

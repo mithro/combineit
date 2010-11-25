@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css">
+<script type="text/javascript" src="/js/third_party/interface.js"></script>
+
+<style type="text/css" media="all"> 
+.fisheye {
+  text-align: center;
+  height: 50px;
+  position: relative;
+}
+
+a.fisheye-item {
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+  width: 40px;
+  position: absolute;
+  display: block;
+  top: 0;
+}
+
+.fisheye-item img {
+  border: none;
+  margin: 0 auto 5px auto;
+  width: 100%;
+}
+
+.fisheye-item span {
+  display: none;
+  positon: absolute;
+}
+
+div.atoms {
+}
+
+.fisheye-container {
+  background-color: #f00;
+  height: 50px;
+  width: 200px;
+  left: 500px;
+  position: absolute;
+}
+
+a.atom-icon {
+  border: none;
+  display: block;
+  float: left;
+  width: 64px;
+  height: 64px;
+}
+a.atom-icon img {
+  width: 64px;
+  height: 64px;
+}
+a.atom-icon span {
+  font-size: 10pt;
+}
+
+#bench-top {
+  width: 100%;
+  border: 1px solid blue;
+  height: 100px;
+}
+
+</style>
+
+{% endblock %}
+{% block body %}
+
+
+<div id='bench-top'>
+</div>
+<a href="#" id='blend'>Blend!</a>
+
+<!-- The category list plus atoms go here -->
+<div id='bench-drawer'>
+  <div id='bench-categories' class='fisheye'>
+    <div class='container fisheye-container'></div>
+  </div>
+  <div id='bench-atoms'></div>
+</div>
+
+<script src="/js/playjs.js"></script>
+<!-- Download the initial game starting state -->
+<script src="/{{ game.url }}/categories/my?output=json&callback=registerCategories"></script>
+<script src="/{{ game.url }}/elements/my?output=json&callback=registerAtoms"></script>
+<script src="/{{ game.url }}/combos/my?output=json&callback=registerCombos"></script>
+
+{% endblock %}

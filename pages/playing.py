@@ -64,7 +64,10 @@ class PlayJSPage(common.LoginPage):
     if not self.setup(gameurl):
       return
 
-    return self.render('templates/playjs.html', {})
+    if self.request.get('mobile'):
+      return self.render('templates/playjs-mobile.html', {})
+    else:
+      return self.render('templates/playjs.html', {})
 
   get = post
 

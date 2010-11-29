@@ -173,7 +173,7 @@ function blendedCallback(json) {
       registerAtom(atom);
     });
 
-    var input = $('<div></div>', {'class': 'ui-grid-b'}).appendTo(resultcontent);
+    var input = $('<div></div>', {'class': 'ui-grid-a'}).appendTo(resultcontent);
     $.each(json.usercombination.reference.inputkeys, function(i, atomkey) {
       input.append(objectIcon(atoms_by_globalkey[atomkey]));
     });

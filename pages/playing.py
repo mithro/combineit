@@ -65,9 +65,9 @@ class PlayJSPage(common.LoginPage):
       return
 
     if self.request.get('mobile'):
-      return self.render('templates/playjs-mobile.html', {})
+      return self.render('templates/play-js-mobile.html', {})
     else:
-      return self.render('templates/playjs.html', {})
+      return self.render('templates/play-js-desktop.html', {})
 
   get = post
 
@@ -136,7 +136,7 @@ class PlayPage(common.LoginPage):
       return
 
     scratch_html, elements = self.RenderUserBench('scratch', thisform='scratch', submitform='bench')
-    return self.render('templates/play.html', {
+    return self.render('templates/play-basic.html', {
         'scratch': elements,
         'scratch_bench': scratch_html,
         })

@@ -108,7 +108,7 @@ class PlayPage(common.LoginPage):
     categories = query.fetch(1000)
 
     if not categories:
-      return '', []
+      return False, []
 
     selected_category_key = self.request.get(prefix+'_category')
     try:
@@ -150,7 +150,7 @@ class PlayPage(common.LoginPage):
 
     else:
       scratch_html, elements = self.RenderUserBench('scratch', thisform='scratch', submitform='bench')
-      if not elements:
+      if scratch_html is False:
         self.redirect('/%s/start' % self.game.url)
         return
 

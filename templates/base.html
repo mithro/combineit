@@ -23,32 +23,47 @@
         <li>Featured <span class=small>&#9660;</span>
           <ul>
             {% for g in featured_games %}
-            <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
+            <li><a href="/{{ g.url }}/start#">{{ g.name }}</a></li>
             {% endfor %}
-          </ul></li>
+          </ul>
+        </li>
         {% endif %}
         {% if popular_games %}
         <li>Popular <span class=small>&#9660;</span>
           <ul>
             {% for g in popular_games %}
-            <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
+            <li><a href="/{{ g.url }}/start#">{{ g.name }}</a></li>
             {% endfor %}
-          </ul></li>
+          </ul>
+        </li>
         {% endif %}
         {% if current_games %}
         <li>Playing <span class=small>&#9660;</span>
           <ul>
             {% for g in current_games %}
-            <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
+            <li><a href="/{{ g.url }}/play#">{{ g.name }}</a></li>
             {% endfor %}
-          </ul></li>
-        </ul>
+          </ul>
+        </li>
         {% endif %}
+        </ul>
 
       <ul class="right">
         {% if user %}
         <li>{{ user.email }}</a></li>
-        <li><a href="/settings#">Settings</a></li>
+        <li>Options <span class=small>&#9660;</span>
+          <ul>
+            {% ifequal mode "js" %}
+            <li><a href="{{ path }}?mode=basic">Basic UI</a></li>
+            <li><a href="{{ path }}?mode=mobilejs">Mobile UI</a></li>
+            {% else %}
+            <li><a href="{{ path }}?mode=js">Fancy UI</a></li>
+            <li><a href="{{ path }}?mode=mobilejs">Mobile UI</a></li>
+            {% endifequal %}
+            {% block options %}
+            {% endblock %}
+          </ul>
+        </li>
         <li><a href="{{ logout_url }}">Logout</a></li>
         {% else %}
         <li><a href="{{ login_url }}">Login</a></li>

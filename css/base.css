@@ -41,8 +41,6 @@ a {
   width: 100%;
   height: 1.8em;
 
-  overflow: hidden;
-
   background: #e8e8e8;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e8e8e8'); /* for IE */
   background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e8e8e8)); /* for webkit browsers */
@@ -115,6 +113,7 @@ a {
 }
 
 .chrome ul.middle {
+  overflow: hidden;
   text-align: center;
 }
 
@@ -150,6 +149,47 @@ a {
   padding-top: 0;
   font-size: 18pt;
   font-weight: bold;
+}
+
+.chrome ul li ul {
+  display: none;
+
+  border: 0;
+  padding: 0;
+  margin: 0;
+
+  position: absolute;
+  left: 0;
+  top: 1.7em;
+  float: none;
+}
+
+.chrome ul li ul li {
+  border: 0;
+  width: 100%;
+  background: white;
+  white-space: nowrap;
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chrome ul a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.chrome ul li:hover ul {
+  display: block;
+}
+
+.chrome ul li:active ul {
+  display: block;
+}
+
+.chrome ul li ul:hover {
+  display: block;
 }
 
 #header .left .current {

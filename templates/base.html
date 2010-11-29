@@ -19,18 +19,23 @@
     <div id="header" class="chrome">
       <ul class="left">
         <li {% ifequal path '/' %}class='current'{%endifequal%}><a href="/#">Home</a></li>
+        {% if featured_games %}
         <li>Featured <span class=small>&#9660;</span>
           <ul>
             {% for g in featured_games %}
             <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
             {% endfor %}
           </ul></li>
+        {% endif %}
+        {% if popular_games %}
         <li>Popular <span class=small>&#9660;</span>
           <ul>
             {% for g in popular_games %}
             <li><a href="/{{ g.url }}#">{{ g.name }}</a></li>
             {% endfor %}
           </ul></li>
+        {% endif %}
+        {% if current_games %}
         <li>Playing <span class=small>&#9660;</span>
           <ul>
             {% for g in current_games %}
@@ -38,7 +43,7 @@
             {% endfor %}
           </ul></li>
         </ul>
-
+        {% endif %}
 
       <ul class="right">
         {% if user %}

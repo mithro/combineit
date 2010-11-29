@@ -1,5 +1,9 @@
 
-all: third_party
+all: submodules third_party
+
+submodules:
+	git submodule init
+	git submodule update
 
 third_party: jquery-mobile jquery
 

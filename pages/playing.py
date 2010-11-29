@@ -1,6 +1,7 @@
 """Module which contains pages for actually playing the game."""
 
 import logging
+import re
 
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
@@ -21,13 +22,40 @@ class IndexPage(common.BasePage):
     query = base.Game.all()
     games = [i for i in query.fetch(1000)]
 
-    self.render(
-        'templates/index.html', {'games': games})
+    template = 'templates/index.html'
+    if self.mode == 'mobilejs':
+      template = 'templates/index-mobile.html'
+
+    self.render(template, {'games': games})
 
 
 class StartPage(common.LoginPage):
   """Page which populates the user with all the starting game information."""
-  pass
+
+  def get(self, gameurl):
+    if not self.setup(gameurl):
+      return
+
+    peruser.UsersGame.Create(self.user, self.game, self.game)
+
+    for category_key in self.game.starting_categories:
+      category = base.Category.get(category_key)
+      peruser.UsersCategory.Create(self.user, self.game, category)
+
+    for element_key in self.game.starting_elements:
+      element = base.Element.get(element_key)
+      peruser.UsersElement.Create(self.user, self.game, element)
+
+    if self.request.get('output'):
+      callback = re.sub('[^A-Za-z]', '', self.request.get('callback')).strip()
+
+      if not callback:
+        self.response.headers['Content-Type'] = 'application/json'
+      else:
+        self.response.headers['Content-Type'] = 'application/x-javascript'
+        self.response.out.write('%s();' % callback)
+    else:
+      self.redirect('/%s/play' % self.game.url)
 
 
 class AbandonPage(common.LoginPage):
@@ -38,6 +66,11 @@ class AbandonPage(common.LoginPage):
   def get(self, gameurl):
     if not self.setup(gameurl):
       return
+
+    games_query = peruser.UsersGame.all(keys_only=True)
+    games_query.filter('game =', self.game)
+    games_query.filter('user =', self.user)
+    db.delete(games_query.fetch(1000))
 
     categories_query = peruser.UsersCategory.all(keys_only=True)
     categories_query.filter('game =', self.game)
@@ -57,27 +90,10 @@ class AbandonPage(common.LoginPage):
     self.redirect('/')
 
 
-class PlayJSPage(common.LoginPage):
-  """A Page which is javascript based."""
-
-  def post(self, gameurl):
-    if not self.setup(gameurl):
-      return
-
-    if self.request.get('mobile'):
-      return self.render('templates/play-js-mobile.html', {})
-    else:
-      return self.render('templates/play-js-desktop.html', {})
-
-  get = post
-
-
 class PlayPage(common.LoginPage):
   """Page which actually lets you play the game."""
 
   def RenderUserBench(self, prefix, thisform, submitform=None):
-    # FIXME: This doesn't belong on this class
-
     # Get all the elements in the current "scratch area"
     keys = self.RenderBenchKeys(prefix, [])
     if keys:
@@ -91,17 +107,8 @@ class PlayPage(common.LoginPage):
     query.filter('user =', self.user)
     categories = query.fetch(1000)
 
-    # Populate the database
     if not categories:
-      for category_key in self.game.starting_categories:
-        category = base.Category.get(category_key)
-
-        categories.append(
-            peruser.UsersCategory.Create(self.user, self.game, category))
-
-      for element_key in self.game.starting_elements:
-        element = base.Element.get(element_key)
-        peruser.UsersElement.Create(self.user, self.game, element)
+      return '', []
 
     selected_category_key = self.request.get(prefix+'_category')
     try:
@@ -135,11 +142,22 @@ class PlayPage(common.LoginPage):
     if not self.setup(gameurl):
       return
 
-    scratch_html, elements = self.RenderUserBench('scratch', thisform='scratch', submitform='bench')
-    return self.render('templates/play-basic.html', {
-        'scratch': elements,
-        'scratch_bench': scratch_html,
-        })
+    if self.mode == 'mobilejs':
+      return self.render('templates/play-js-mobile.html', {})
+
+    elif self.mode == 'js':
+      return self.render('templates/play-js-desktop.html', {})
+
+    else:
+      scratch_html, elements = self.RenderUserBench('scratch', thisform='scratch', submitform='bench')
+      if not elements:
+        self.redirect('/%s/start' % self.game.url)
+        return
+
+      return self.render('templates/play-basic.html', {
+          'scratch': elements,
+          'scratch_bench': scratch_html,
+          })
 
   get = post
 

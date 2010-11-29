@@ -71,6 +71,8 @@ a.atom-icon span {
 {% endblock %}
 {% block body %}
 
+    <a href="/{{ game.url }}/abandon#">Restart Game</a>
+
 
 <div id='bench-top'>
 </div>
@@ -84,10 +86,8 @@ a.atom-icon span {
   <div id='bench-atoms'></div>
 </div>
 
-<script src="/js/playjs.js"></script>
-<!-- Download the initial game starting state -->
-<script src="/{{ game.url }}/categories/my?output=json&callback=registerCategories"></script>
-<script src="/{{ game.url }}/elements/my?output=json&callback=registerAtoms"></script>
-<script src="/{{ game.url }}/combos/my?output=json&callback=registerCombos"></script>
+<script src="/js/playjs-common.js"></script>
+<script src="/js/playjs-desktop.js"></script>
+<script src="/{{ game.url }}/start?output=json&callback=getData"></script>
 
 {% endblock %}

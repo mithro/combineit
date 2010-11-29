@@ -25,7 +25,6 @@ application = webapp.WSGIApplication(
    ('/(.*)/start',             playing.StartPage),
    ('/(.*)/combine',           playing.CombinePage),
    ('/(.*)/play',              playing.PlayPage),
-   ('/(.*)/playjs',            playing.PlayJSPage),
    ('/(.*)/abandon',           playing.AbandonPage),
    ('/(.*)/elements',          elements.ElementPage),
    ('/(.*)/elements/list',     elements.ElementListPage),

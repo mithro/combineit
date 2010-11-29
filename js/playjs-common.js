@@ -33,12 +33,21 @@ function registerResults(callback, json) {
 
 function registerCategories(json) {
   registerResults(registerCategory, json);
+  $('body').append(
+      $('<script></script>', {'src': "elements/my?output=json&callback=registerAtoms"}));
 }
 
 function registerAtoms(json) {
   registerResults(registerAtom, json);
+  $('body').append(
+      $('<script></script>', {'src': "combos/my?output=json&callback=registerCombos"}));
 }
 
 function registerCombos(json) {
   registerResults(registerCombo, json);
+}
+
+function getData() {
+  $('body').append(
+      $('<script></script>', {'src': "categories/my?output=json&callback=registerCategories"}));
 }

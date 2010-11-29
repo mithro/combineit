@@ -33,6 +33,12 @@ class Reference(db.Model):
   game = db.ReferenceProperty(Game)
 
 
+class UsersGame(Reference):
+  """A game which a user is playing."""
+
+  reference = db.ReferenceProperty(Game)
+
+
 class UsersElement(Reference):
   """The list of elements a User has discovered."""
 

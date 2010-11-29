@@ -18,9 +18,9 @@
 
 
   <div data-role="header" data-position="inline" data-nobackbtn="true">
-    <a href="index.html" data-icon="delete">Games</a>
+    <a rel="external" href="/" data-icon="back">Games</a>
     <h1>{{ game.name }}</h1>
-    <a href="index.html" data-icon="gear" class="ui-btn-right">Options</a>
+    <a href="#options" data-icon="gear" class="ui-btn-right">Options</a>
   </div>
 
   <div data-role="content">
@@ -49,8 +49,10 @@
 
 <script src="/js/playjs-common.js"></script>
 <script src="/js/playjs-mobile.js"></script>
-<!-- Download the initial game starting state -->
-<script src="/{{ game.url }}/categories/my?output=json&callback=registerCategories"></script>
-<script src="/{{ game.url }}/elements/my?output=json&callback=registerAtoms"></script>
-<script src="/{{ game.url }}/combos/my?output=json&callback=registerCombos"></script>
+<script src="/{{ game.url }}/start?output=json&callback=getData"></script>
+{% endblock %}
+{% block options %}
+
+<a rel=external href="/{{ game.url }}/abandon" data-role="button">Abandon</a>
+
 {% endblock %}

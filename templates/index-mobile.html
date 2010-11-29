@@ -1,0 +1,91 @@
+{% extends "base-mobile.html" %}
+{% block body %}
+
+<style>
+  .center {
+    text-align: center;
+  }
+</style>
+
+<div data-role="page" id="home">
+
+
+  <div data-role="header" data-position="inline" data-nobackbtn="true">
+    <h1>Combine It!</h1>
+    <a href="#options" data-icon="gear" class="ui-btn-right">Options</a>
+  </div>
+
+  <div data-role="content">
+
+    {% if current_games %}
+    <ul id="current" data-role="listview" data-inset="true">
+      <li data-role="list-divider" class="center">
+        Playing
+      </li>
+      {% for g in current_games %}
+      <li>
+        <img src="{{ g.icon }}" />
+        <h3><a rel="external" href="/{{ g.url }}/play">{{ g.name }}</a></h3>
+        <p>{{ g.description }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if featured_games %}
+    <ul id="featured" data-role="listview" data-inset="true">
+      <li data-role="list-divider" class="center">
+        Featured
+      </li>
+      {% for g in featured_games %}
+      <li>
+        <img src="{{ g.icon }}" />
+        <h3><a rel="external" href="/{{ g.url }}/play">{{ g.name }}</a></h3>
+        <p>{{ g.description }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if popular_games %}
+    <ul id="popular" data-role="listview" data-inset="true">
+      <li data-role="list-divider" class="center">
+        Popular
+      </li>
+      {% for g in popular_games %}
+      <li>
+        <img src="{{ g.icon }}" />
+        <h3><a rel="external" href="/{{ g.url }}/play">{{ g.name }}</a></h3>
+        <p>{{ g.description }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <a href="#games" data-role="button" data-theme="b">All games</a>
+
+  </div>
+</div><!-- /page -->
+
+<div data-role="page" id="games">
+
+  <div data-role="header" data-position="inline" data-theme="b">
+    <h1>All Games</h1>
+    <a href="#options" data-icon="gear" class="ui-btn-right">Options</a>
+  </div>
+
+  <div data-role="content">
+    <ul id="all" data-role="listview">
+      {% for g in games %}
+      <li>
+        <img src="{{ g.icon }}" />
+        <h3><a rel="external" href="/{{ g.url }}/play">{{ g.name }}</a></h3>
+        <p>{{ g.description }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+</div><!-- /page -->
+
+{% endblock %}

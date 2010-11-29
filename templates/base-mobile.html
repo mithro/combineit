@@ -4,7 +4,7 @@
     <title>{{ game.name }}</title>
 
 {% if jquery_cdn %}
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery{{ jquery_minimized }}js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery{{ jquery_minimized }}.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2{{ jquery_minimized }}.js"></script>
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2{{ jquery_minimized }}.css" />
 {% else %}
@@ -19,6 +19,22 @@
   <body>
 
 {% block body %}{% endblock %}
+
+
+<div data-role="page" id="options">
+
+  <div data-role="header" data-position="inline" data-theme="b">
+    <h1>{{ game.name }} Options</h1>
+    <a href="#options" data-icon="gear" class="ui-btn-right">Options</a>
+  </div>
+
+  <div data-role="content">
+{% block options %}{% endblock %}
+
+<a rel=external href="{{ path }}?mode=js" data-role="button">Desktop UI</a>
+  </div>
+</div><!-- /page -->
+
 
 </body>
 </html>

@@ -1,6 +1,7 @@
 #!/usr/bin/python2.5
 #
 
+import datetime
 import json
 import logging
 import pprint
@@ -12,6 +13,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 
 from models import base
+from models import peruser
 from models import stats
 
 
@@ -23,6 +25,57 @@ class BasePage(webapp.RequestHandler):
     """Setup some common information to all pages."""
     self.game = None
 
+    if self.request.get('mode', self.request.cookies.get('mode', '')) == 'js':
+
+      # Set the forced mode cookie
+      expire = datetime.datetime.now()+datetime.timedelta(days=30)
+      self.response.headers.add_header(
+          'Set-Cookie', 'mode=js; expires=%s; path=/;' % (
+              expire.strftime("%a, %d-%b-%Y %H:%M:%S GMT")))
+
+      self.mode = 'js'
+
+    elif self.request.get('mode', self.request.cookies.get('mode', '')) == 'mobilejs':
+
+      # Set the no-mode cookie
+      expire = datetime.datetime.now()+datetime.timedelta(days=30)
+      self.response.headers.add_header(
+          'Set-Cookie', 'mode=mobilejs; expires=%s; path=/;' % (
+              expire.strftime("%a, %d-%b-%Y %H:%M:%S GMT")))
+
+      self.mode = 'mobilejs'
+
+    elif self.request.get('mode', self.request.cookies.get('mode', '')) == 'basic':
+
+      # Set the no-mode cookie
+      expire = datetime.datetime.now()+datetime.timedelta(days=30)
+      self.response.headers.add_header(
+          'Set-Cookie', 'mode=basic; expires=%s; path=/;' % (
+              expire.strftime("%a, %d-%b-%Y %H:%M:%S GMT")))
+
+      self.mode = 'basic'
+
+    else:
+      # In detect mode, clear any forced header
+      if self.request.cookies.get('mode', ''):
+        expire = datetime.datetime.now()-datetime.timedelta(days=30)
+        self.response.headers.add_header(
+            'Set-Cookie', 'mode=; expires=%s; path=/;' % (
+                expire.strftime("%a, %d-%b-%Y %H:%M:%S GMT")))
+
+      self.mode = 'js'
+
+      # User agent detection for mode devices..
+      user_agent = str(self.request.headers['User-Agent']).lower()
+      if 'android' in user_agent:
+        self.mode = 'mobilejs'
+
+      if 'iphone' in user_agent or 'ipod' in user_agent:
+        self.mode = 'mobilejs'
+
+      if 'ipad' in user_agent:
+        self.mode = 'mobilejs'
+
     # User needs to be logged in
     self.user = users.get_current_user()
 
@@ -31,6 +84,8 @@ class BasePage(webapp.RequestHandler):
     self.game = base.Game.all().filter('url =', gameurl).get()
     if not self.game:
       return False
+
+    logging.info('mode? %s', self.mode)
 
     return True
 
@@ -59,8 +114,13 @@ class BasePage(webapp.RequestHandler):
     else:
       logging.info('url %s', urlparse.urlparse(self.request.uri).path)
 
+      current_query = peruser.UsersGame().all()
+      current_query.filter("user =", self.user)
+      current_games = [x.reference for x in current_query.fetch(1000)]
 
       result.update({
+          'jquery_cdn': True,
+          'mode': self.mode,
           'title': self.title,
           'path': urlparse.urlparse(self.request.uri).path,
           'login_url': users.create_login_url(self.request.uri),
@@ -69,7 +129,8 @@ class BasePage(webapp.RequestHandler):
           'user': self.user,
           'is_current_user_admin': users.is_current_user_admin(),
           'featured_games': stats.FeaturedGame.all().fetch(10),
-          'top_games': [],
+          'popular_games': stats.PopularGame.all().fetch(10),
+          'current_games': current_games,
           })
 
       self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
@@ -98,7 +159,7 @@ class BasePage(webapp.RequestHandler):
     logging.info('keys final %r', keys)
     return keys
 
-    
+
 class LoginPage(BasePage):
   """This page requires the user to be logged in to access."""
 

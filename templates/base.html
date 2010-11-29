@@ -51,7 +51,7 @@
       <ul class="right">
         {% if user %}
         <li>{{ user.email }}</a></li>
-        <li>Options <span class=small>&#9660;</span>
+        <li style="width: 10em;">Options <span class=small>&#9660;</span>
           <ul>
             {% ifequal mode "js" %}
             <li><a href="{{ path }}?mode=basic">Basic UI</a></li>
@@ -62,9 +62,9 @@
             {% endifequal %}
             {% block options %}
             {% endblock %}
+            <li><a href="{{ logout_url }}">Logout</a></li>
           </ul>
         </li>
-        <li><a href="{{ logout_url }}">Logout</a></li>
         {% else %}
         <li><a href="{{ login_url }}">Login</a></li>
         {% endif %}

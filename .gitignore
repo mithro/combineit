@@ -1,2 +1,3 @@
 *.pyc
 *.sw*
+third_party/interface/dist

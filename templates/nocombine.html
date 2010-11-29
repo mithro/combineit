@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block body %}
+  <div style="text-align: center;" onClick="window.location.href='/{{ game.url }}/play';">
   <h1>{{game.name}} created by {{game.owner.nickname}}</h1>
 
   <h1>No combination found!</h1>
   <p>
     {{error}}
   </p>
+  </div>
 {% endblock %}

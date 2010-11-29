@@ -1,15 +1,24 @@
 {% extends "base.html" %}
 {% block head %}
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui.js"></script>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css">
-<script type="text/javascript" src="/js/third_party/interface.js"></script>
 
-<style type="text/css" media="all"> 
+{% if jquery_cdn %}
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery{{ jquery_minimized }}.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui{{ jquery_minimized }}.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css">
+{% else %}
+    <script type="text/javascript" src="/third_party/jquery/jquery{{ jquery_minimized }}.js"></script>
+    <script type="text/javascript" src="/third_party/jquery-mobile/jquery-mobile{{ jquery_minimized }}.js"></script>
+    <link rel="stylesheet" href="/third_party/jquery-mobile/jquery-mobile{{ jquery_minimized }}.css" />
+{% endif %}
+
+<script type="text/javascript" src="/third_party/interface/interface{{ jquery_minimized }}.js"></script>
+
+<style type="text/css" media="all">
 .fisheye {
-  text-align: center;
+  position: absolute;
+  bottom: 1em;
+  width: 100%;
   height: 50px;
-  position: relative;
 }
 
 a.fisheye-item {
@@ -20,12 +29,13 @@ a.fisheye-item {
   width: 40px;
   position: absolute;
   display: block;
-  top: 0;
+  bottom: 0;
 }
+
 
 .fisheye-item img {
   border: none;
-  margin: 0 auto 5px auto;
+  margin: 5px auto 0 auto;
   width: 100%;
 }
 
@@ -34,36 +44,17 @@ a.fisheye-item {
   positon: absolute;
 }
 
-div.atoms {
-}
-
 .fisheye-container {
-  background-color: #f00;
   height: 50px;
   width: 200px;
   left: 500px;
   position: absolute;
 }
 
-a.atom-icon {
+a.atom {
   border: none;
   display: block;
   float: left;
-  width: 64px;
-  height: 64px;
-}
-a.atom-icon img {
-  width: 64px;
-  height: 64px;
-}
-a.atom-icon span {
-  font-size: 10pt;
-}
-
-#bench-top {
-  width: 100%;
-  border: 1px solid blue;
-  height: 100px;
 }
 
 </style>
@@ -71,23 +62,46 @@ a.atom-icon span {
 {% endblock %}
 {% block body %}
 
-    <a href="/{{ game.url }}/abandon#">Restart Game</a>
+<table class="bench">
+  <tr>
+    <td class="bench-left">
+      &nbsp;
+    </td>
 
+    <td class="bench-middle">
+      <div id='bench-top'>
+      </div>
+    </td>
 
-<div id='bench-top'>
-</div>
-<a href="#" id='blend'>Blend!</a>
+    <td class="bench-right">
+      &nbsp;
+    </td>
+
+    <td class="category">
+      <div class="button">
+        <div>
+          <a href="#" id='blend'>
+            Combine!
+          </a>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
 
 <!-- The category list plus atoms go here -->
 <div id='bench-drawer'>
+  <div id='bench-atoms'></div>
   <div id='bench-categories' class='fisheye'>
     <div class='container fisheye-container'></div>
   </div>
-  <div id='bench-atoms'></div>
 </div>
 
 <script src="/js/playjs-common.js"></script>
 <script src="/js/playjs-desktop.js"></script>
 <script src="/{{ game.url }}/start?output=json&callback=getData"></script>
 
+{% endblock %}
+{% block options %}
+   <li><a href="/{{ game.url }}/abandon">Abandon Game</a></li>
 {% endblock %}

@@ -1,11 +1,18 @@
-function objectIcon(obj, callback) {
+function objectIcon(obj, callback, nodiv) {
 
   var link = $("<a/>", {href: "#", key: obj.key, click: function() {
     callback(obj, link);
   }});
+
+  var appendto = null;
+  if (nodiv) {
+    var appendto = link;
+  } else {
+    var appendto = $("<div/>", {"class": "icon"}).appendTo(link);
+  }
+  var span = $("<span/>", {text: obj.reference.name}).appendTo(appendto);
   var img  = $("<img />", {src: obj.reference.icon,
-                           alt: obj.reference.description}).appendTo(link);
-  var span = $("<span/>", {text: obj.reference.name}).appendTo(link);
+                           alt: obj.reference.description}).appendTo(appendto);
   return link;
 }
 
@@ -15,7 +22,7 @@ function buildBenchTop() {
   benchtop.empty();
 
   benchtop.droppable({
-     accept: ".atom-icon",
+     accept: ".atom",
      activeClass: "ui-state-highlight",
      drop: addDroppedAtom
   });
@@ -31,7 +38,7 @@ function blendItBaby() {
 
   var atom_keys = [];
 
-  $('#bench-top a.atom-icon').each(function(i, atomui) {
+  $('#bench-top a.atom').each(function(i, atomui) {
     atom_keys.push($(atomui).attr('key'));
   });
 
@@ -110,18 +117,20 @@ function buildCategories() {
   for (categorykey in categories_by_userkey) {
     var category = categories_by_userkey[categorykey];
 
-    var link = objectIcon(category, showAtoms);
+    var link = objectIcon(category, showAtoms, true);
     link.addClass('fisheye-item');
     f.append(link);
   }
 
   bench.Fisheye({
-    maxWidth: 50,
+    maxWidth: 128,
     items: 'a',
     itemsText: 'span',
     container: '.fisheye-container',
     itemWidth: 40,
-    proximity: 90,
+    proximity: 80,
+    alignment: 'left',
+    valign: 'bottom',
     halign : 'center'});
 }
 
@@ -138,7 +147,7 @@ function buildAtoms() {
       var atom = category.atoms[i];
 
       var link = objectIcon(atom, addAtom);
-      link.addClass('atom-icon');
+      link.addClass('atom');
 
       link.draggable({
           revert: 'invalid',
@@ -163,7 +172,7 @@ function build() {
 /* Functions which actually play the game. */
 
 function showAtoms(category, ui) {
-  $('#bench-atoms div').hide();
+  $('#bench-atoms div.atoms').hide();
   $('#'+category.key).show();
 }
 

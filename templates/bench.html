@@ -24,10 +24,14 @@ function {{prefix}}_remove_element( key )
     <input type="hidden" name="{{ prefix }}_add" value="">
     <input type="hidden" name="{{ prefix }}_remove" value="">
 
-    <table class="scratch">
+    <table class="scratch bench">
       <tr>
+        <td class="bench-left">
+          &nbsp;
+        </td>
+
         {% for element in scratch %}
-        <td colspan=2>
+        <td class="bench-middle">
           <div>
             <input type="hidden" name="{{ prefix }}_scratch" value="{{ element|key }}">
             <a href="#" onClick="{{prefix}}_remove_element( '{{ forloop.counter0 }}')">
@@ -35,20 +39,30 @@ function {{prefix}}_remove_element( key )
             </a>
           </div>
         </td>
+        {% empty %}
+        <td class="bench-middle">
+          &nbsp;
+        </td>
         {% endfor %}
 
-        <td class="category bench">
+        <td class="bench-right">
+          &nbsp;
+        </td>
+
+        <td class="category">
           <div class="button">
-            <input type="hidden" name="{{ prefix }}_scratch" value="">
-            <a href="#" onClick="document.forms['{{ submitform }}'].submit()">
-              Submit
-            </a>
+            <div>
+              <input type="hidden" name="{{ prefix }}_scratch" value="">
+              <a href="#" onClick="document.forms['{{ submitform }}'].submit()">
+                Combine!
+              </a>
+            </div>
           </div>
         </td>
       </tr>
-     </table>
+    </table>
 
-     <table>
+    <table>
       {% for category in categories %}
       <tr>
 

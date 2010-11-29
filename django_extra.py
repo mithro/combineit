@@ -34,12 +34,11 @@ def icon(obj, autoescape=False):
 
   return mark_safe("""\
 <div class='icon'>
+  <span>%(name)s</span>
   <img src='%(icon)s' alt='%(desc)s'>
-  %(name)s
 </div>
 """ % {'icon': esc(realobj.icon),
        'desc': esc(realobj.description),
        'name': esc(realobj.name)})
 
 icon.needs_autoescape = True
-

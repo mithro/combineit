@@ -19,6 +19,7 @@ body {
   margin: 0;
   border: 0;
 
+  font-family: Arial, sans-serif;
   font-size: 14pt;
 }
 
@@ -114,6 +115,7 @@ a {
 
 .chrome ul.middle {
   overflow: hidden;
+  height: 100%;
   text-align: center;
 }
 
@@ -210,18 +212,9 @@ a {
   width: 100%;
 }
 
-table.bench {
-  height: 150px;
-  width: 100%;
-  border: 1px solid black;
-}
-
 .button {
   width: 150px;
   height: 150px;
-  text-align: center;
-  display: table-cell;
-  vertical-align: middle;
 
   border: 1px solid black;
   -moz-border-radius: 20px;
@@ -231,12 +224,20 @@ table.bench {
 
 }
 
+.button div {
+  width: 150px;
+  height: 150px;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
 td.category {
   width: 150px;
 }
 
 td.selected {
-  border-left: 1px solid black; 
+  border-left: 1px solid black;
   border-top: 1px solid black;
   border-bottom: 1px solid black;
 }
@@ -264,4 +265,46 @@ div.icon img {
   height: 128px;
   margin-left: 11px;
   margin-right: 11px;
+}
+
+table.bench {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 10px solid white;
+  margin-top: 10px;
+}
+
+table.bench td {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+table.bench td.bench-left {
+  background-image:url('/images/bench-left.png');
+  width: 88px;
+  height: 200px;
+}
+
+table.bench td.bench-middle {
+  background-image:url('/images/bench-middle.png');
+  height: 200px;
+  vertical-align: bottom;
+}
+
+#bench-top {
+  width: 100%;
+}
+
+table.bench td.bench-middle div {
+  float: left;
+  height: 100%;
+  padding-bottom: 15px;
+}
+
+table.bench td.bench-right {
+  background-image:url('/images/bench-right.png');
+  width: 88px;
+  height: 200px;
 }

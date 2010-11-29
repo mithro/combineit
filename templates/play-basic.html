@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% block body %}
-    <a href="/{{ game.url }}/abandon#">Restart Game</a>
-
   <form id="scratch" action="/{{ game.url }}/play#" method="post">
     {{ scratch_bench }}
   </form>
@@ -19,6 +17,9 @@
     {% endfor %}
   </form>
 
+{% endblock %}
+{% block options %}
+   <li><a href="/{{ game.url }}/abandon">Abandon Game</a></li>
 {% endblock %}
 {% block admin %}
    <li><a href="#" onClick="document.forms.quickcreate.submit()">Quick Create</a></li>

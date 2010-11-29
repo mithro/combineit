@@ -17,5 +17,17 @@ handlers:
 - url: /css
   static_dir: css
 
+- url: /third_party
+  static_dir: third_party/dist
+
 - url: /.*
   script: handler.py
+
+
+skip_files:
+ - README
+ - LICENSE
+ - third_party/(?:(?!dist).)*$
+ - \.git
+ - (.*/)?\..*
+ - .*\.pyc

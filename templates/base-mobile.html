@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ game.name }}</title>
+
+{% if jquery_cdn %}
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery{{ jquery_minimized }}js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2{{ jquery_minimized }}.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2{{ jquery_minimized }}.css" />
+{% else %}
+    <script type="text/javascript" src="/third_party/jquery/jquery{{ jquery_minimized }}.js"></script>
+    <script type="text/javascript" src="/third_party/jquery-mobile/jquery-mobile{{ jquery_minimized }}.js"></script>
+    <link rel="stylesheet" href="/third_party/jquery-mobile/jquery-mobile{{ jquery_minimized }}.css" />
+{% endif %}
+
+{% block head %}{% endblock %}
+
+  </head>
+  <body>
+
+{% block body %}{% endblock %}
+
+</body>
+</html>

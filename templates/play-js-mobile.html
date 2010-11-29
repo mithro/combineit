@@ -1,32 +1,18 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>{{ game.name }}</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.min.css" />
-    <script src="http://code.jquery.com/mobile/1.0a2/jquery.mobile-1.0a2.js"></script>
-
-    <!--
-      <link rel="stylesheet" href="/third_party/jquery-mobile/jquery.mobile-1.0a3pre.css" />
-      <script type="text/javascript" src="/third_party/jquery-mobile/jquery.mobile-1.0a3pre.js"></script>
-      -->
-  </head>
-  <body>
-
-    <style>
-      .icon {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-        position: relative;
-        max-height: 80px;
-        max-width: 80px;
-      }
-      .icon-text {
-      }
-    </style>
+{% extends "base-mobile.html" %}
+{% block body %}
+<style>
+  .icon {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+    position: relative;
+    max-height: 80px;
+    max-width: 80px;
+  }
+  .icon-text {
+  }
+</style>
 
 <div data-role="page" id="home">
 
@@ -67,6 +53,4 @@
 <script src="/{{ game.url }}/categories/my?output=json&callback=registerCategories"></script>
 <script src="/{{ game.url }}/elements/my?output=json&callback=registerAtoms"></script>
 <script src="/{{ game.url }}/combos/my?output=json&callback=registerCombos"></script>
-
-</body>
-</html>
+{% endblock %}

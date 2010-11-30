@@ -13,7 +13,7 @@
         <tr>
             <td><img src="{{ game.icon }}"></td>
             <td>{{ game.name }} </td>
-            <td><a href="/{{ game.url }}/edit?key={{ game.key }}#">Edit</a></td>
+            <td>{% if game|is_admin:user %}<a href="/{{ game.url }}/edit?key={{ game.key }}#">Edit</a>{% endif %}</td>
             <td><a href="/{{ game.url }}/play#">Play</a></td>
         </tr>
         {% endfor %}

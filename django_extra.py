@@ -9,6 +9,11 @@ from django.utils.safestring import mark_safe
 
 
 @register.filter
+def is_admin(game, user):
+  return game.is_admin(user)
+
+
+@register.filter
 def key(obj):
   if not obj:
     return ''

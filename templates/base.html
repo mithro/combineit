@@ -83,7 +83,7 @@
 
     <!-- Footer - Admin functions -->
     <div id=footer class=chrome>
-      {% if is_current_user_admin %}
+      {% if is_admin %}
       <ul class=left>
         {% if game %}
         <li><a href="/game/edit?key={{ game|key }}#">Edit Game</a></li>

@@ -40,9 +40,10 @@ class GameEditPage(GamePage):
     if key:
       game = base.Game.get(self.request.get('key'))
     else:
-      game = base.Game(name='Name goes here',
-                  description='Description goes here.',
-                  url='newurl')
+      game = base.Game(
+          name='Name goes here',
+          description='Description goes here.',
+          url='newurl')
 
     if url:
       game.url = url

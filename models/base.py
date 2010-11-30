@@ -20,12 +20,24 @@ class Game(db.Model):
   description = db.StringProperty(
       multiline=True, default='Game description goes here.')
   background = db.StringProperty()
+
   owner = db.UserProperty(required=True, auto_current_user_add=True)
+  admin = db.StringListProperty()
 
   icon = db.StringProperty(default="/images/question-green.png")
 
   starting_categories = db.StringListProperty()
   starting_elements = db.StringListProperty()
+
+  def is_admin(self, user):
+    if user is None:
+       return False
+    if user == self.owner:
+       return True
+    if user.user_id() in self.admin:
+       return True
+    return False
+
 
 class Category(db.Model):
   """How to group different elements together."""

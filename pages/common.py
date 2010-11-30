@@ -119,6 +119,11 @@ class BasePage(webapp.RequestHandler):
       current_query.filter("user =", self.user)
       current_games = [x.reference for x in current_query.fetch(1000)]
 
+      if not self.game:
+        is_admin = False
+      else:
+        is_admin = self.game.is_admin(self.user)
+
       result.update({
           'jquery_cdn': True,
           'mode': self.mode,
@@ -128,7 +133,7 @@ class BasePage(webapp.RequestHandler):
           'logout_url': users.create_logout_url(self.request.uri),
           'game': self.game,
           'user': self.user,
-          'is_current_user_admin': users.is_current_user_admin(),
+          'is_admin': is_admin,
           'featured_games': stats.FeaturedGame.all().fetch(10),
           'popular_games': stats.PopularGame.all().fetch(10),
           'current_games': current_games,
@@ -176,7 +181,15 @@ class LoginPage(BasePage):
 
 class GameAdminPage(LoginPage):
   """This page requires the person to be the admin of the game to access."""
-  pass
+
+  def setup(self, gameurl):
+    result = LoginPage.setup(self, gameurl)
+
+    if not self.game.is_admin(self.user):
+      self.redirect('/')
+      return False 
+
+    return result
 
 
 class EditListPage(GameAdminPage):

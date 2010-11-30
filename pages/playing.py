@@ -1,3 +1,7 @@
+# Copyright (c) 2010 Google Inc. All rights reserved.
+# Use of this source code is governed by a Apache-style license that can be
+# found in the LICENSE file.
+
 """Module which contains pages for actually playing the game."""
 
 import logging

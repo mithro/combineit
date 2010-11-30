@@ -1,7 +1,6 @@
-#!/usr/bin/python2.5
-#
-
-"""This module represents what people have voted for."""
+# Copyright (c) 2010 Google Inc. All rights reserved.
+# Use of this source code is governed by a Apache-style license that can be
+# found in the LICENSE file.
 
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'

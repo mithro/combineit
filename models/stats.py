@@ -1,3 +1,6 @@
+# Copyright (c) 2010 Google Inc. All rights reserved.
+# Use of this source code is governed by a Apache-style license that can be
+# found in the LICENSE file.
 
 from google.appengine.ext import db
 

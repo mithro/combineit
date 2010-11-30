@@ -6,20 +6,20 @@
       <table>
         <tr>
           <td>URL:</td>
-          <td><input type="text" name="url" value="{{ object.url }}"></td>
+          <td colspan=2><input type="text" name="url" value="{{ object.url }}"></td>
         </tr><tr>
           <td>Name:</td>
-          <td><input type="text" name="name" value="{{ object.name }}"></td>
+          <td colspan=2><input type="text" name="name" value="{{ object.name }}"></td>
         </tr><tr>
           <td>Description:</td>
-          <td><textarea name="description">{{ object.description }}</textarea></td>
+          <td colspan=2><textarea name="description">{{ object.description }}</textarea></td>
         </tr><tr>
-          <td><a href="/{{ object.url }}/categories/list#">Categories</a></td>
-          <td><a href="/{{ object.url }}/elements/list#">Elements</a></td>
-          <td><a href="/{{ object.url }}/combos/list#">Combinations</a></td>
+          <td><a href="/{{ object.url }}/categories/list#">Categories</a> {{ object.category_count }}</td>
+          <td><a href="/{{ object.url }}/elements/list#">Elements</a> {{ object.element_count }}</td>
+          <td><a href="/{{ object.url }}/combos/list#">Combinations</a> {{ object.combo_count }}</td>
         </tr><tr>
           <td>Starting<br>Categories:</td>
-          <td>
+          <td colspan=2>
             <select name="starting_categories" multiple>
             {% for category in categories %}
               <option value="{{ category|key }}" 
@@ -34,7 +34,7 @@
           </td>
         </tr><tr>
           <td>Starting<br>Elements:</td>
-          <td>
+          <td colspan=2>
             <select name="starting_elements" multiple>
             {% for element in elements %}
               <option value="{{ element|key }}" 
@@ -49,10 +49,10 @@
           </td>
         </tr><tr>
           <td>Icon:</td>
-          <td><input type="text" name="icon" value="{{ object.icon }}" 
+          <td colspan=2><input type="text" name="icon" value="{{ object.icon }}" 
             onchange="document.getElementById('icon-preview').src = this.value;"></td>
         </tr><tr>
-          <td colspan="2"><img id="icon-preview" src="{{ object.icon }}" height="256" width="256"></td>
+          <td colspan="3"><img id="icon-preview" src="{{ object.icon }}" height="256" width="256"></td>
         </tr><tr>
           <td><input type="submit" value="Save"></td>
           <td><a href="/games/delete?key={{object|key}}#">Delete</a></td>

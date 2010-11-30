@@ -7,6 +7,27 @@
 from google.appengine.ext import db
 
 
+class CategoryCount(db.Property):
+  def get_value_for_datastore(self, obj):
+    query = Category.all(keys_only=True)
+    query.filter('game =', obj)
+    return len(query.fetch(1000))
+
+
+class ElementCount(db.Property):
+  def get_value_for_datastore(self, obj):
+    query = Element.all(keys_only=True)
+    query.filter('game =', obj)
+    return len(query.fetch(1000))
+
+
+class ComboCount(db.Property):
+  def get_value_for_datastore(self, obj):
+    query = Combination.all(keys_only=True)
+    query.filter('game =', obj)
+    return len(query.fetch(1000))
+
+
 class Game(db.Model):
   """A single combination game."""
   created_by = db.UserProperty(required=True, auto_current_user_add=True)
@@ -28,6 +49,10 @@ class Game(db.Model):
 
   starting_categories = db.StringListProperty()
   starting_elements = db.StringListProperty()
+
+  category_count = CategoryCount()
+  element_count = ElementCount()
+  combo_count = ComboCount()
 
   def is_admin(self, user):
     if user is None:
@@ -57,6 +82,7 @@ class Category(db.Model):
   @property
   def key_str(self):
     return str(self.key())
+
 
 class Element(db.Model):
   """Fundamental building blocks of the game.

@@ -8,7 +8,12 @@ submodules:
 	git submodule init
 	git submodule update
 
-third_party: jquery-mobile jquery
+third_party: interface jquery-mobile jquery
+
+interface:
+	cd third_party/interface; \
+		make; \
+		echo "jquery interface done!"
 
 jquery:
 	# Disable stupid crlf mode

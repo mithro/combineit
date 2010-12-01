@@ -101,11 +101,15 @@ function blendedCallback(json) {
   }
 
   function onClose() {
-    $( this ).dialog( "close" );
     $( this ).empty();
     build();
 
     ajaxCall = null;
+  }
+
+  function onOkay() {
+    $( this ).dialog( "close" );
+    onClose();
   }
 
   dialog.dialog({
@@ -116,7 +120,8 @@ function blendedCallback(json) {
       show: "blind",
       hide: "blind",
       width: "90%",
-      buttons: { Ok: onClose }
+      close: onClose,
+      buttons: { Ok: onOkay }
       });
 
   dialog.dialog( "open" );

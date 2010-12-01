@@ -5,6 +5,9 @@
       <input name="key" type="hidden" value="{{ object|key }}">
       <table>
         <tr>
+          <td>Owner:</td>
+          <td colspan=2>{{ object.owner.nick }} &lt;{{ object.owner.email }}&gt;</td>
+        </tr><tr>
           <td>URL:</td>
           <td colspan=2><input type="text" name="url" value="{{ object.url }}"></td>
         </tr><tr>
@@ -13,6 +16,8 @@
         </tr><tr>
           <td>Description:</td>
           <td colspan=2><textarea name="description">{{ object.description }}</textarea></td>
+        </tr><tr>
+          <td colspan=3><i>(Numbers update on save - used for victory condition.)</i></td>
         </tr><tr>
           <td><a href="/{{ object.url }}/categories/list#">Categories</a> {{ object.category_count }}</td>
           <td><a href="/{{ object.url }}/elements/list#">Elements</a> {{ object.element_count }}</td>

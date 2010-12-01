@@ -94,6 +94,9 @@
       {% endif %}
 
       <ul class=right>
+        {% if user %}
+        <li>User ID: {{ user.user_id }}</li>
+        {% endif %}
         {% if game %}
         <li>{{ game.name }} created by {{ game.created_by.nickname }} </li>
         {% endif %}

@@ -9,23 +9,32 @@ from google.appengine.ext import db
 
 class CategoryCount(db.Property):
   def get_value_for_datastore(self, obj):
-    query = Category.all(keys_only=True)
-    query.filter('game =', obj)
-    return len(query.fetch(1000))
+    try:
+      query = Category.all(keys_only=True)
+      query.filter('game =', obj)
+      return len(query.fetch(1000))
+    except db.NotSavedError:
+      return 0
 
 
 class ElementCount(db.Property):
   def get_value_for_datastore(self, obj):
-    query = Element.all(keys_only=True)
-    query.filter('game =', obj)
-    return len(query.fetch(1000))
+    try:
+      query = Element.all(keys_only=True)
+      query.filter('game =', obj)
+      return len(query.fetch(1000))
+    except db.NotSavedError:
+      return 0
 
 
 class ComboCount(db.Property):
   def get_value_for_datastore(self, obj):
-    query = Combination.all(keys_only=True)
-    query.filter('game =', obj)
-    return len(query.fetch(1000))
+    try:
+      query = Combination.all(keys_only=True)
+      query.filter('game =', obj)
+      return len(query.fetch(1000))
+    except db.NotSavedError:
+      return 0
 
 
 class Game(db.Model):

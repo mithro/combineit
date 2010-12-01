@@ -27,6 +27,7 @@ handlers:
 skip_files:
  - README
  - LICENSE
+ - images/LICENSE
  - third_party/(?:(?!dist).)*$
  - \.git
  - (.*/)?\..*

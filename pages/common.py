@@ -204,6 +204,7 @@ class EditListPage(GameAdminPage):
 
     query = self.klass.all()
     query.filter('game =', self.game)
+    query.order('name')
 
     objects = [i for i in query.fetch(1000)]
 

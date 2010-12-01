@@ -12,7 +12,7 @@
         </tr>
         {% for object in objects %}
         <tr>
-            <td>{{ object.name }} </td>
+            <td>{{ object.name|fancy }} </td>
             <td><img src="{{ object.icon }}" width=32 height=32></td>
             <td><a href="/{{ game.url }}/{{ url }}/edit?key={{ object|key }}#">Edit</a></td>
             <td><a href="/{{ game.url }}/{{ url }}/delete?key={{ object|key }}#">Delete</a></td>

@@ -12,7 +12,7 @@
         {% for game in games %}
         <tr>
             <td>{{ game|icon }}</td>
-            <td>{{ game.name }} </td>
+            <td>{{ game.name|fancy }} </td>
             <td>{% if game|is_admin:user %}<a href="/{{ game.url }}/edit?key={{ game.key }}#">Edit</a>{% endif %}</td>
             <td><a href="/{{ game.url }}/play#">Play</a></td>
         </tr>

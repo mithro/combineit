@@ -62,6 +62,8 @@ function blendItBaby() {
 
 function blendedCallback(json) {
   var dialog = $('#dialog');
+  
+  var title = '';
 
   if (json.code == 200) {
     $.each(json.new_usercategories, function(i, category) {
@@ -72,32 +74,51 @@ function blendedCallback(json) {
       registerAtom(atom);
     });
 
-    var message = $("<div/>");
+
+    var title = '';
     if (json.new_usercombination) {
-      message.append($("<h1>NEW!</h1>"));
+      title = 'New combination discovered!';
+    } else {
+      title = 'Combination already discovered';
     }
-    message.append($("<h1>" + json.usercombination.reference.name + "</h1>"));
 
-    var input = $('<div/>');
+    var table = $('<table/>', {'class': 'dialog'});
+    dialog.append(table);
+
+    var inputtr = $('<tr/>');
+    table.append(inputtr);
+
+    var input = $('<tr>').appendTo(
+      $('<table>').appendTo(
+        $('<td>', {'class': 'input'}).appendTo(
+          inputtr)));
     $.each(json.usercombination.reference.inputkeys, function(i, atomkey) {
-      input.append(
+      input.append($('<td>').append(
         objectIcon(atoms_by_globalkey[atomkey], function() {})
-        );
+        ));
     });
 
-    var output = $('<div/>');
+    table.append($('<tr/>').append(
+      $('<td>', {'class': 'arrow'}).append(
+        $('<img />', {src: '/images/down.png'}))));
+
+    var output = $('<tr>').appendTo(
+      $('<table>').appendTo(
+        $('<td>', {'class': 'output'}).appendTo(
+          $('<tr>').appendTo(
+            table))));
     $.each(json.usercombination.reference.outputkeys, function(i, atomkey) {
-      output.append(
+      output.append($('<td>').append(
         objectIcon(atoms_by_globalkey[atomkey], function() {})
-        );
+        ));
     });
 
-    dialog.append(message);
-    dialog.append(input);
-    dialog.append(output);
+    inputtr.append($('<td/>', {rowspan: 3, 'class': 'desc'}).append(
+      $('<h1>' + json.usercombination.reference.name + '</h1>')).append(
+      $('<span>' + json.usercombination.reference.description + '</span>')));
 
   } else {
-    dialog.append($("<h1>" + json.error + "</h1>"));
+    title = json.error;
   }
 
   function onClose() {
@@ -120,6 +141,7 @@ function blendedCallback(json) {
       show: "blind",
       hide: "blind",
       width: "90%",
+      title: title,
       close: onClose,
       buttons: { Ok: onOkay }
       });

@@ -4,10 +4,10 @@
 {% if jquery_cdn %}
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery{{ jquery_minimized }}.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/jquery-ui{{ jquery_minimized }}.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/base/jquery-ui.css">
 {% else %}
     <script type="text/javascript" src="/third_party/jquery/jquery{{ jquery_minimized }}.js"></script>
-    <script type="text/javascript" src="/third_party/jquery-mobile/jquery-mobile{{ jquery_minimized }}.js"></script>
+    <script type="text/javascript" src="/third_party/jquery-ui/jquery-ui{{ jquery_minimized }}.js"></script>
     <link rel="stylesheet" href="/third_party/jquery-mobile/jquery-mobile{{ jquery_minimized }}.css" />
 {% endif %}
 
@@ -95,6 +95,9 @@ a.atom {
   <div id='bench-categories' class='fisheye'>
     <div class='container fisheye-container'></div>
   </div>
+</div>
+
+<div id='dialog'>
 </div>
 
 <script src="/js/playjs-common.js"></script>

@@ -61,7 +61,7 @@ function blendItBaby() {
 }
 
 function blendedCallback(json) {
-  var dialog = $('<div />');
+  var dialog = $('#dialog');
 
   if (json.code == 200) {
     $.each(json.new_usercategories, function(i, category) {
@@ -102,16 +102,24 @@ function blendedCallback(json) {
 
   function onClose() {
     $( this ).dialog( "close" );
+    $( this ).empty();
     build();
 
     ajaxCall = null;
   }
 
   dialog.dialog({
-    width: "90%",
-    modal: true,
-    buttons: { Ok: onClose }
-    });
+      autoOpen: false,
+      draggable: false,
+      resizable: false,
+      modal: true,
+      show: "blind",
+      hide: "blind",
+      width: "90%",
+      buttons: { Ok: onClose }
+      });
+
+  dialog.dialog( "open" );
 }
 
 function buildCategories() {

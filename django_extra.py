@@ -2,10 +2,28 @@
 # Use of this source code is governed by a Apache-style license that can be
 # found in the LICENSE file.
 
+import logging
+import re
+
 from google.appengine.ext import db
 from django.template.defaultfilters import stringfilter, register
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+
+
+@register.filter
+def fancy(text, autoescape=False):
+  if autoescape:
+    esc = conditional_escape
+  else:
+    esc = lambda x: x
+
+  text = esc(text)
+
+  text = re.sub('\^\{(.*?)\}', r'<sup>\1</sup>', text)
+  text = re.sub('_\{(.*?)\}', r'<sub>\1</sub>', text)
+
+  return mark_safe(text)
 
 
 @register.filter
@@ -46,7 +64,7 @@ def icon(obj, autoescape=False):
   <span>%(name)s</span>
 </div>
 """ % {'icon': esc(realobj.icon),
-       'desc': esc(realobj.description),
-       'name': esc(realobj.name)})
+       'desc': fancy(realobj.description, autoescape),
+       'name': fancy(realobj.name, autoescape)})
 
 icon.needs_autoescape = True

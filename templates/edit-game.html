@@ -8,6 +8,14 @@
           <td>Owner:</td>
           <td colspan=2>{{ object.owner.nick }} &lt;{{ object.owner.email }}&gt;</td>
         </tr><tr>
+          <td>Admins:</td>
+          <td colspan=2>
+             {% for admin in object.admin %}
+             <input type="text" name="admin" value="{{ admin }}">
+             {% endfor %}
+             <input type="text" name="admin" value="">
+        </td>
+        </tr><tr>
           <td>URL:</td>
           <td colspan=2><input type="text" name="url" value="{{ object.url }}"></td>
         </tr><tr>

@@ -256,6 +256,7 @@ td.element {
 div.icon {
   width: 150px;
   text-align: center;
+  float: left;
 
   font-size: 12pt;
 }

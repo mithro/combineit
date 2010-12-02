@@ -53,6 +53,10 @@ class GameEditPage(GamePage):
       if attr_value:
         setattr(game, attr, attr_value)
 
+    admin = [x.strip() for x in self.request.get_all('admin') if x.strip()]
+    if admin:
+      game.admin = admin
+
     starting_categories = self.request.get_all('starting_categories')
     if starting_categories:
       game.starting_categories = starting_categories

@@ -5,6 +5,7 @@
 """Describe a game."""
 
 from google.appengine.ext import db
+from google.appengine.api import users
 
 
 class CategoryCount(db.Property):
@@ -69,6 +70,8 @@ class Game(db.Model):
     if user == self.owner:
        return True
     if user.user_id() in self.admin:
+       return True
+    if users.is_current_user_admin():
        return True
     return False
 
